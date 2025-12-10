@@ -6,7 +6,6 @@ from .email import EmailIngestItem
 
 
 class FullIngestionStartRequest(BaseModel):
-    user_id: str
     provider: str = "gmail"
     # 如果你从 provider 那边已经拿到一个初始游标，比如 Gmail historyId
     initial_checkpoint: Optional[str] = None

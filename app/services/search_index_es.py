@@ -7,6 +7,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
 
 from app.config import settings
+from app.services.text_normalization import to_simplified
 
 es = Elasticsearch(settings.ELASTICSEARCH_URL)
 
@@ -28,6 +29,7 @@ def ensure_email_index():
                 "email_id": {"type": "integer"},
                 "external_id": {"type": "keyword"},
                 "thread_id": {"type": "keyword"},
+                "chunk_id": {"type": "integer"},
                 "subject": {"type": "text"},
                 "body_text": {"type": "text"},
                 "sender": {"type": "keyword"},
@@ -54,36 +56,37 @@ def index_email_document(
         email_id: int,
         external_id: str,
         thread_id: str,
+        chunk_id: int,
         subject: str,
         body_text: str,
         sender: str,
         recipients: str,
-        labels: str | None,
         ts: datetime,
         importance_score: float,
         is_promotion: bool,
         embedding: List[float],
+        labels: Optional[str] = None,
 ) -> None:
     """
-    将一封邮件写入 ES 索引。
+    将一封邮件的一个 chunk 写入 ES 索引。
     """
     doc = {
         "user_id": user_id,
         "email_id": email_id,
         "external_id": external_id,
         "thread_id": thread_id,
+        "chunk_id": chunk_id,
         "subject": subject,
         "body_text": body_text,
         "sender": sender,
         "recipients": recipients,
         "labels": (labels or "").split(",") if labels else [],
         "ts": ts,
-        "importance_score": importance_score,
         "is_promotion": bool(is_promotion),
         "embedding": embedding,
     }
     index_name = settings.ELASTICSEARCH_INDEX_EMAILS
-    es.index(index=index_name, id=f"{user_id}:{email_id}", document=doc)
+    es.index(index=index_name, id=f"{user_id}:{email_id}:{chunk_id}", document=doc)
 
 
 def search_email_documents(
@@ -93,14 +96,15 @@ def search_email_documents(
         *,
         date_start: Optional[datetime] = None,
         date_end: Optional[datetime] = None,
-        labels: Optional[List[str]] = None,
+        keywords: Optional[List[str]] = None,
         size: int = 50,
 ) -> List[Dict[str, Any]]:
-    """
-    在 ES 中做 hybrid 搜索：filter(user_id, date, labels) + match + knn。
-    返回 hits 列表，每个 hit 包含 _source, _score 等。
-    """
+
     index_name = settings.ELASTICSEARCH_INDEX_EMAILS
+
+    # Normalize to simplified Chinese so match queries ignore traditional/simplified differences.
+    query_text_s = to_simplified(query_text)
+    keywords_s = [to_simplified(k) for k in keywords] if keywords else []
 
     filters: List[Dict[str, Any]] = [
         {"term": {"user_id": user_id}},
@@ -109,22 +113,44 @@ def search_email_documents(
         filters.append({"range": {"ts": {"gte": date_start.isoformat()}}})
     if date_end:
         filters.append({"range": {"ts": {"lte": date_end.isoformat()}}})
-    if labels:
-        filters.append({"terms": {"labels": labels}})
+
+    # 构造 should 关键词查询（第一种 match）
+    should_queries = [
+        {
+            "multi_match": {
+                "query": query_text_s,
+                "fields": ["subject^3", "body_text"],
+            }
+        }
+    ]
+
+    # 如果 keywords 存在，则加入关键词 match
+    if keywords_s:
+        should_queries.append(
+            {
+                "multi_match": {
+                    "query": " ".join(keywords_s),
+                    "fields": ["subject^5"],
+                    "operator": "or",
+                }
+            }
+        )
+
+    lexical_boost = 0.7   # BM25 权重
+    vector_boost = 0.3    # 向量权重
 
     body: Dict[str, Any] = {
         "size": size,
+        "sort": [
+            {"_score": {"order": "desc"}},  # 先按相关度排序
+            {"ts": {"order": "desc"}}, # 时间降序
+        ],
         "query": {
             "bool": {
                 "filter": filters,
-                "must": [
-                    {
-                        "multi_match": {
-                            "query": query_text,
-                            "fields": ["subject^3", "body_text"],
-                        }
-                    }
-                ],
+                "should": should_queries,
+                "minimum_should_match": 1,   # 至少命中一个
+                "boost": lexical_boost,
             }
         },
         "knn": {
@@ -133,6 +159,7 @@ def search_email_documents(
             "k": size,
             "num_candidates": max(size * 2, 100),
             "filter": filters,
+            "boost": vector_boost,        # 向量检索部分的权重
         },
     }
 
@@ -142,3 +169,4 @@ def search_email_documents(
         return []
 
     return resp.get("hits", {}).get("hits", [])
+

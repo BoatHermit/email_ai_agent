@@ -72,3 +72,21 @@ class IngestionSession(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
+
+
+class MailboxSyncState(Base):
+    """
+    记录外部邮箱（如 Outlook）的同步状态与令牌，用于增量同步。
+    """
+
+    __tablename__ = "mailbox_sync_state"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, index=True)
+    provider = Column(String, index=True)  # "outlook" 等
+    access_token = Column(Text, nullable=True)
+    refresh_token = Column(Text, nullable=True)
+    delta_link = Column(Text, nullable=True)  # Microsoft Graph delta link
+    last_synced_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow)

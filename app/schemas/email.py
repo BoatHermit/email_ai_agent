@@ -19,7 +19,6 @@ class EmailIngestItem(BaseModel):
 
 
 class EmailIngestRequest(BaseModel):
-    user_id: str
     emails: List[EmailIngestItem]
 
 

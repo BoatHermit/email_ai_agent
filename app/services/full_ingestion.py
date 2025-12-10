@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from sqlalchemy.orm import Session
 
 from app.db import models
@@ -9,14 +10,14 @@ from app.schemas.ingestion import (
 from app.services.email_ingest import ingest_emails
 
 
-def start_full_ingestion(db: Session, payload: FullIngestionStartRequest) -> models.IngestionSession:
+def start_full_ingestion(db: Session, payload: FullIngestionStartRequest, user_id: str) -> models.IngestionSession:
     """
     创建一个新的全量导入会话。
     如果同一 user + provider 有尚未完成的会话，也可以选择复用/报错。
     这里简单起见：总是新建一个会话。
     """
     session = models.IngestionSession(
-        user_id=payload.user_id,
+        user_id=user_id,
         provider=payload.provider,
         status="in_progress",
         checkpoint_token=payload.initial_checkpoint,
@@ -31,7 +32,7 @@ def start_full_ingestion(db: Session, payload: FullIngestionStartRequest) -> mod
     return session
 
 
-def ingest_full_batch(db: Session, payload: FullIngestionBatchRequest) -> models.IngestionSession:
+def ingest_full_batch(db: Session, payload: FullIngestionBatchRequest, user_id: Optional[str] = None) -> models.IngestionSession:
     """
     将一批邮件写入 DB + ES，并更新对应 IngestionSession 的进度和 checkpoint。
     由于 ingest_emails 本身对 (user_id, external_id) 是幂等的，
@@ -44,6 +45,8 @@ def ingest_full_batch(db: Session, payload: FullIngestionBatchRequest) -> models
     )
     if not session:
         raise ValueError(f"IngestionSession {payload.session_id} not found")
+    if user_id and session.user_id != user_id:
+        raise ValueError(f"IngestionSession {payload.session_id} does not belong to user {user_id}")
 
     if session.status not in ("in_progress",):
         # 你也可以选择允许对 completed 做补充，这里简单直接拒绝

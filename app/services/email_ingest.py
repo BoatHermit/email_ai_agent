@@ -5,6 +5,23 @@ from app.schemas.email import EmailIngestItem
 from app.db import models
 from app.services.embeddings import embed_text
 from app.services.search_index_es import index_email_document
+from app.services.text_normalization import to_simplified
+
+
+def _chunk_text(text: str, max_chars: int = 5000) -> list[str]:
+    """
+    简单按字符切片，避免超出 embedding 上限。可根据需要改为按 token 切分。
+    """
+    if not text:
+        return [""]
+    chunks = []
+    start = 0
+    n = len(text)
+    while start < n:
+        end = min(start + max_chars, n)
+        chunks.append(text[start:end])
+        start = end
+    return chunks
 
 
 def ingest_emails(db: Session, user_id: str, emails: List[EmailIngestItem]) -> int:
@@ -37,25 +54,29 @@ def ingest_emails(db: Session, user_id: str, emails: List[EmailIngestItem]) -> i
         db.add(rec)
         db.flush()  # 得到 rec.id
 
-        # 计算 embedding & 写入 ES
-        text_for_embedding = f"{rec.subject}\n\n{rec.body_text}"
-        vec = embed_text(text_for_embedding)
-
-        index_email_document(
-            user_id=user_id,
-            email_id=rec.id,
-            external_id=rec.external_id,
-            thread_id=rec.thread_id,
-            subject=rec.subject,
-            body_text=rec.body_text,
-            sender=rec.sender,
-            recipients=rec.recipients,
-            labels=rec.labels,
-            ts=rec.ts,
-            importance_score=rec.importance_score,
-            is_promotion=bool(rec.is_promotion),
-            embedding=vec,
-        )
+        # 计算 embedding & 按 chunk 写入 ES
+        subject_s = to_simplified(rec.subject or "")
+        body_text_s = to_simplified(rec.body_text or "")
+        text_for_embedding = f"{subject_s}\n\n{body_text_s}"
+        chunks = _chunk_text(text_for_embedding)
+        for idx, chunk in enumerate(chunks):
+            vec = embed_text(chunk)
+            index_email_document(
+                user_id=user_id,
+                email_id=rec.id,
+                external_id=rec.external_id,
+                thread_id=rec.thread_id,
+                chunk_id=idx,
+                subject=subject_s,
+                body_text=chunk,
+                sender=rec.sender,
+                recipients=rec.recipients,
+                labels=rec.labels,
+                ts=rec.ts,
+                importance_score=rec.importance_score,
+                is_promotion=bool(rec.is_promotion),
+                embedding=vec,
+            )
 
         count += 1
 
