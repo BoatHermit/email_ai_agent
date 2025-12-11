@@ -24,25 +24,28 @@
   </header>
 
   <main class="layout">
-    <section class="mail-pane">
+    <section class="pane mail-list-pane">
       <div class="mail-toolbar">
         <div class="search">
           <input id="searchInput" type="search" placeholder="搜索主题或发件人...">
         </div>
         <div class="pager">
-          <button id="prevPage">上一页</button>
+          <button id="prevPage" aria-label="上一页">&lt;</button>
           <span id="pageInfo">第 1 页</span>
-          <button id="nextPage">下一页</button>
+          <button id="nextPage" aria-label="下一页">&gt;</button>
         </div>
       </div>
 
       <div id="emailList" class="email-list"></div>
+    </section>
+
+    <section class="pane mail-detail-pane">
       <div id="emailDetail" class="email-detail empty">
         <div class="placeholder">选择一封邮件查看详情</div>
       </div>
     </section>
 
-    <section class="chat-pane">
+    <section class="pane chat-pane">
       <div class="chat-header">
         <div>
           <div class="chat-title">AI 助手</div>
@@ -56,7 +59,7 @@
       <div id="chatHistory" class="chat-history"></div>
 
       <div class="chat-input">
-        <textarea id="chatInput" rows="3" placeholder="向 AI 提问，右侧会显示回答和引用的邮件片段..."></textarea>
+        <textarea id="chatInput" rows="3" placeholder="向 AI 提问，右侧会显示回答."></textarea>
         <button id="sendButton">发送</button>
       </div>
     </section>

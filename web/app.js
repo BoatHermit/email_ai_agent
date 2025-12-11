@@ -14,6 +14,7 @@
   const chatInput = document.getElementById("chatInput");
   const sendButton = document.getElementById("sendButton");
   const statusBar = document.getElementById("statusBar");
+  let statusTimer = null;
 
   const state = {
     page: 1,
@@ -52,9 +53,19 @@
     return userIdInput.value.trim() || "demo";
   }
 
-  function setStatus(message, type = "info") {
+  function setStatus(message, type = "info", duration = 3000) {
+    if (statusTimer) {
+      clearTimeout(statusTimer);
+      statusTimer = null;
+    }
     statusBar.textContent = message;
     statusBar.classList.toggle("error", type === "error");
+    statusBar.style.display = "block";
+    if (duration !== null) {
+      statusTimer = setTimeout(() => {
+        statusBar.style.display = "none";
+      }, duration);
+    }
   }
 
   function formatDate(ts) {
@@ -123,7 +134,7 @@
     });
 
     const totalPages = Math.max(1, Math.ceil(state.total / state.pageSize));
-    pageInfo.textContent = `第 ${state.page} / ${totalPages} 页（${state.total} 封）`;
+    pageInfo.textContent = `第 ${state.page} / ${totalPages} 页`;
     prevPageBtn.disabled = state.page <= 1;
     nextPageBtn.disabled = state.page >= totalPages;
   }
@@ -195,7 +206,11 @@
     state.chatMessages.forEach((msg) => {
       const bubble = document.createElement("div");
       bubble.className = `chat-bubble ${msg.role}`;
-      bubble.innerHTML = escapeHtml(msg.content);
+      if (msg.role === "bot") {
+        bubble.innerHTML = `<div class="md">${renderMarkdown(msg.content)}</div>`;
+      } else {
+        bubble.innerHTML = escapeHtml(msg.content);
+      }
       chatHistory.appendChild(bubble);
     });
     chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -206,7 +221,7 @@
     if (!question) return;
     appendChatMessage("user", question);
     chatInput.value = "";
-    setStatus("AI 思考中...");
+    setStatus("AI 思考中...", "info", null);
     try {
       const res = await fetch(`${getApiBase()}/ai/ask`, {
         method: "POST",
@@ -235,6 +250,50 @@
   function appendChatMessage(role, content, sources) {
     state.chatMessages.push({ role, content, sources: sources || [] });
     renderChat();
+  }
+
+  function renderMarkdown(text) {
+    // Escape HTML first to avoid injection
+    let escaped = escapeHtml(text || "");
+
+    // Headings (simple)
+    escaped = escaped
+      .replace(/^###\s+(.+)$/gm, "<h4>$1</h4>")
+      .replace(/^##\s+(.+)$/gm, "<h3>$1</h3>")
+      .replace(/^#\s+(.+)$/gm, "<h2>$1</h2>");
+
+    // Inline styles
+    escaped = escaped
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.+?)\*/g, "<em>$1</em>")
+      .replace(/`([^`]+)`/g, "<code>$1</code>");
+
+    // Lists
+    const lines = escaped.split(/\r?\n/);
+    let inList = false;
+    const htmlLines = [];
+    for (const line of lines) {
+      if (/^\s*[-*+]\s+/.test(line)) {
+        if (!inList) {
+          htmlLines.push("<ul>");
+          inList = true;
+        }
+        htmlLines.push("<li>" + line.replace(/^\s*[-*+]\s+/, "") + "</li>");
+      } else {
+        if (inList) {
+          htmlLines.push("</ul>");
+          inList = false;
+        }
+        if (line.trim() === "") {
+          htmlLines.push("<br>");
+        } else {
+          htmlLines.push(line);
+        }
+      }
+    }
+    if (inList) htmlLines.push("</ul>");
+
+    return htmlLines.join("\n");
   }
 
   function resetChat(newChatId = null) {

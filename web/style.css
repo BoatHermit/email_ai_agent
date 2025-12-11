@@ -24,6 +24,26 @@ body {
   min-height: 100vh;
 }
 
+/* Global scrollbar styling */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.35), rgba(14, 165, 233, 0.3));
+  border-radius: 999px;
+  border: 2px solid rgba(17, 24, 39, 0.7);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.55), rgba(14, 165, 233, 0.5));
+}
+
 .topbar {
   display: flex;
   align-items: center;
@@ -95,7 +115,7 @@ button.ghost {
 
 .layout {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  grid-template-columns: 0.9fr 1.1fr 1fr;
   gap: 14px;
   padding: 14px;
   height: calc(100vh - 70px);
@@ -103,8 +123,7 @@ button.ghost {
   overflow: hidden;
 }
 
-.mail-pane,
-.chat-pane {
+.pane {
   background: rgba(17, 24, 39, 0.75);
   border: 1px solid var(--card-border);
   border-radius: 12px;
@@ -113,6 +132,14 @@ button.ghost {
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+}
+
+.mail-list-pane {
+  min-width: 280px;
+}
+
+.mail-detail-pane {
+  min-width: 360px;
 }
 
 .mail-toolbar {
@@ -154,8 +181,15 @@ button.ghost {
   padding: 12px;
   cursor: pointer;
   display: grid;
+  grid-template-rows: auto auto 1fr;
   gap: 6px;
   transition: border 0.12s ease, transform 0.08s ease;
+  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  height: 150px;
+  overflow: hidden;
+  align-content: start;
 }
 
 .email-item:hover {
@@ -173,6 +207,7 @@ button.ghost {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
 .subject {
@@ -184,6 +219,10 @@ button.ghost {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .meta {
@@ -205,9 +244,9 @@ button.ghost {
 .email-detail {
   border-top: 1px solid var(--card-border);
   padding: 14px 12px 16px;
-  min-height: 180px;
+  min-height: 0;
   overflow: auto;
-  flex: 0 0 48%;
+  flex: 1;
 }
 
 .email-detail.empty {
@@ -250,7 +289,8 @@ button.ghost {
 
 .chat-history {
   flex: 1;
-  overflow: auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 260px);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -279,6 +319,7 @@ button.ghost {
   border: 1px solid var(--card-border);
   color: var(--text);
   align-self: flex-start;
+  overflow: visible;
 }
 
 .sources {
@@ -291,9 +332,9 @@ button.ghost {
 
 .chat-input {
   display: grid;
-  grid-template-columns: 1fr 120px;
+  grid-template-columns: 1fr 80px;
   gap: 10px;
-  align-items: end;
+  align-items: stretch;
 }
 
 .chat-input textarea {
@@ -303,14 +344,21 @@ button.ghost {
   background: var(--card);
   color: var(--text);
   padding: 12px;
-  resize: vertical;
-  min-height: 80px;
+  resize: none;
+  min-height: 64px;
+}
+
+.chat-input button {
+  width: 100%;
+  height: 100%;
+  align-self: stretch;
 }
 
 .status-bar {
+  display: none;
   position: fixed;
-  bottom: 16px;
-  right: 16px;
+  right: 24px;
+  bottom: 140px;
   padding: 10px 12px;
   border-radius: 10px;
   background: var(--card);
@@ -319,6 +367,7 @@ button.ghost {
   min-width: 220px;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
   opacity: 0.96;
+  pointer-events: none;
 }
 
 .status-bar.error {
@@ -336,6 +385,43 @@ button.ghost {
   color: var(--text);
 }
 
+.md {
+  line-height: 1.6;
+}
+
+.md h2,
+.md h3,
+.md h4 {
+  margin: 0 0 6px;
+  font-weight: 700;
+}
+
+.md ul {
+  margin: 6px 0 10px 18px;
+  padding: 0;
+  color: var(--text);
+}
+
+.md li {
+  margin: 4px 0;
+}
+
+.md strong {
+  color: #ffffff;
+}
+
+.md em {
+  color: #cbd5e1;
+}
+
+.md code {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 13px;
+}
+
 @media (max-width: 1080px) {
   .layout {
     grid-template-columns: 1fr;
@@ -343,8 +429,7 @@ button.ghost {
     min-height: auto;
   }
 
-  .mail-pane,
-  .chat-pane {
+  .pane {
     min-height: auto;
     height: auto;
   }
