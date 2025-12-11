@@ -18,7 +18,8 @@ TOOLS_DEF = [
                         "type": "array",
                         "items": {
                             "type": "string",
-                            "enum": ["CurrentThread", "EmailHistory", "Calendar", "Compose"],
+                            "enum": ["EmailHistory",],
+                            # "enum": ["CurrentThread", "EmailHistory", "Calendar", "Compose"],
                         },
                     }
                 },

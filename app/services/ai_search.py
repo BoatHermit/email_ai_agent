@@ -33,10 +33,34 @@ class EmailFragment:
 
 
 def _llm_query_rewrite(question: str, chat_history: Optional[str] = None, current_thread: Optional[str] = None) -> str:
-    system_prompt = (
-        "You rewrite user queries about email into standalone queries that include needed context. "
-        "Return only the rewritten query text."
-    )
+    system_prompt = f"""
+        You are a Query Resolver for an email search engine.
+        Your goal is to make the user's query standalone by resolving pronouns and relative time references based on the context, WITHOUT changing the original intent or key terms.
+        
+        Instructions:
+        1. REPLACE pronouns (he, she, it, they, that) with the specific names or entities they refer to from the conversation history.
+        2. REPLACE relative dates (yesterday, last Friday) with specific absolute dates (e.g., 2023-10-27) if known; otherwise keep them as is.
+        3. DO NOT rephrase the question type. (e.g., Do not change "How are you?" to "Search for greeting emails").
+        4. DO NOT add keywords that were not implied.
+        5. KEEP the original sentence structure as much as possible.
+        
+        Return ONLY the rewritten query text. No explanations.
+        
+        Example 1:
+        Context: User is asking about John Smith.
+        Query: "What did he send me yesterday?"
+        Rewritten: "What did John Smith send me yesterday?"
+        
+        Example 2:
+        Context: User is looking for the budget report.
+        Query: "Find the latest version of it."
+        Rewritten: "Find the latest version of the budget report."
+        
+        Example 3: (Negative Constraint)
+        Context: None
+        Query: "When is the team meeting?"
+        Rewritten: "When is the team meeting?" (Do NOT change to "Search for team meeting schedules")
+    """
     context = []
     if chat_history:
         context.append(f"Chat history:\n{chat_history}")
@@ -48,12 +72,26 @@ def _llm_query_rewrite(question: str, chat_history: Optional[str] = None, curren
 
 
 def _llm_feature_extract(query: str) -> QueryFeatures:
-    system_prompt = (
-        "You extract structured search features from a user query about email. "
-        "Return ONLY a JSON object with keys: date_range, people, keywords, recency_bias, confidence. "
-        "date_range is {\"start\": ISO8601 or null, \"end\": ISO8601 or null}. "
-        "people, keywords are string arrays. recency_bias is boolean, confidence is float 0-1."
-    )
+    current_time = datetime.now().isoformat()
+    system_prompt = f"""You extract structured search features from a user query about email.
+
+        Return ONLY a raw JSON object string.
+        DO NOT use Markdown formatting (no ```json or ``` blocks).
+        DO NOT include any explanation or conversational text.
+        
+        The JSON object must have keys: sent_date_range, people, keywords, recency_bias, confidence.
+        
+        - sent_date_range is {{"start": "ISO8601", "end": "ISO8601"}} or null objects.
+          * IMPORTANT: This represents when the email was SENT/RECEIVED, not when the event happens.
+          * If the user queries a future event (e.g., "When is my next meeting?"), keep sent_date_range null (search all history) and set recency_bias to true.
+          * Only set dates if the user explicitly restricts the search window (e.g., "emails from last week").
+        
+        - people, keywords are string arrays.
+          * Include synonyms for keywords (e.g., if "meeting", also add "sync", "call").
+        - recency_bias is boolean.
+        - confidence is float 0-1.
+        
+        Current time: {current_time}"""
     msg = chat_completion(system_prompt, query)
     raw = msg.get("content", "{}")
     try:
@@ -100,8 +138,8 @@ def ai_search(
     4) 简单 heuristic rerank
     """
     # 1. Query rewrite
-    # reformulated = _llm_query_rewrite(question, chat_history=None, current_thread=current_thread_text)
-    reformulated = question
+    reformulated = _llm_query_rewrite(question, chat_history=None, current_thread=current_thread_text)
+    # reformulated = question
     # 2. Feature extraction
     features = _llm_feature_extract(reformulated)
 

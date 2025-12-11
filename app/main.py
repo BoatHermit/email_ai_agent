@@ -166,15 +166,7 @@ def ask_endpoint(
         question=payload.question,
         current_thread_id=payload.current_thread_id,
     )
-    sources = [
-        SourceFragment(
-            email_id=f.email.id,
-            snippet=f.snippet,
-            score=f.score,
-        )
-        for f in frags
-    ]
-    return AskResponse(answer=answer, sources=sources)
+    return AskResponse(answer=answer, sources=frags)
 
 
 @app.post("/outlook/connect", response_model=OutlookSyncResponse)

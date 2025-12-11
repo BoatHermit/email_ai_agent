@@ -1,6 +1,7 @@
 from typing import List, Tuple, Optional
 from sqlalchemy.orm import Session
 
+from app.schemas import SourceFragment
 from app.tools.base import ToolContext
 from app.services.tool_selector import pick_tools, instantiate_tools
 from app.services.llm_provider import chat_completion
@@ -13,7 +14,7 @@ def answer_question(
         user_id: str,
         question: str,
         current_thread_id: Optional[str] = None,
-) -> Tuple[str, List[EmailFragment]]:
+) -> Tuple[str, List[SourceFragment]]:
     """
     High-level pipeline:
     1) Tool selection (LLM)
@@ -33,13 +34,18 @@ def answer_question(
     tool_results = [t.run(ctx) for t in tools]
 
     # Collect AI Search matches for source citations if any
-    source_fragments: List[EmailFragment] = []
+    source_fragments: List[SourceFragment] = []
     for tr in tool_results:
         if tr.name == "EmailHistory":
             for m in tr.metadata.get("matches", []):
                 # We'll just store minimal info; AskResponse struct will map this.
                 # You could keep raw EmailFragment objects in a richer implementation.
-                pass
+                fragment = SourceFragment(
+                    email_id=m.get("email_id"),
+                    snippet=m.get("snippet"),
+                    score=m.get("score"),
+                )
+                source_fragments.append(fragment)
 
     # Build mega prompt
     tool_context_blocks = []
@@ -65,7 +71,7 @@ def answer_question(
     answer = msg.get("content", "")
 
     # For response sources: re-run AI search with small k to show top citations
-    from app.services.ai_search import ai_search as ai_search_func
-    fragments = ai_search_func(db, user_id, question, max_results=5)
+    # from app.services.ai_search import ai_search as ai_search_func
+    # fragments = ai_search_func(db, user_id, question, max_results=5)
 
-    return answer, fragments
+    return answer, source_fragments
