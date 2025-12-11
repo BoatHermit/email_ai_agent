@@ -10,7 +10,13 @@ class EmailHistoryTool(BaseTool):
         self.db = db
 
     def run(self, ctx: ToolContext) -> ToolResult:
-        fragments = ai_search(self.db, ctx.user_id, ctx.question)
+        fragments = ai_search(
+            self.db,
+            ctx.user_id,
+            ctx.question,
+            current_thread_text=None,
+            chat_history=ctx.chat_history,
+        )
         if not fragments:
             return ToolResult(name=self.name, content="", metadata={"matches": []})
 

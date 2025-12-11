@@ -5,6 +5,7 @@ from typing import Optional, List
 class AskRequest(BaseModel):
     question: str
     current_thread_id: Optional[str] = None  # if any
+    chat_id: str = "default"
 
 
 class SourceFragment(BaseModel):

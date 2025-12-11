@@ -33,6 +33,12 @@ from app.services.search_index_es import ensure_email_index
 from app.services.full_ingestion import start_full_ingestion, ingest_full_batch
 from app.services.outlook_ingest import initial_outlook_import, sync_outlook_incremental
 from app.services.gmail_ingest import initial_gmail_import, sync_gmail_incremental
+from app.services.chat_history import (
+    get_chat_history,
+    format_chat_history_text,
+    save_chat_turn,
+    ensure_chat_session_with_title,
+)
 
 # 创建 DB 表
 Base.metadata.create_all(bind=engine)
@@ -160,12 +166,20 @@ def ask_endpoint(
     db: Session = Depends(get_db),
     user_id: str = Depends(deps.get_current_user_id),
 ):
+    chat_id = payload.chat_id or "default"
+    ensure_chat_session_with_title(db, user_id, chat_id, payload.question)
+    history_records = get_chat_history(db, user_id, chat_id)
+    history_text = format_chat_history_text(history_records)
+
     answer, frags = answer_question(
         db,
         user_id=user_id,
         question=payload.question,
         current_thread_id=payload.current_thread_id,
+        chat_id=chat_id,
+        chat_history=history_text,
     )
+    save_chat_turn(db, user_id, chat_id, payload.question, answer)
     return AskResponse(answer=answer, sources=frags)
 
 

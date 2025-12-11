@@ -36,7 +36,12 @@ def pick_tools(ctx: ToolContext) -> List[str]:
         "Given the user's question and context, choose which tools are needed. "
         "Return JSON via the select_tools function."
     )
-    user_prompt = f"Question: {ctx.question}\nCurrent thread id: {ctx.current_thread_id}"
+    history_block = f"\nChat history:\n{ctx.chat_history}" if ctx.chat_history else ""
+    user_prompt = (
+        f"Chat id: {ctx.chat_id}\n"
+        f"Question: {ctx.question}\n"
+        f"Current thread id: {ctx.current_thread_id}{history_block}"
+    )
 
     msg = chat_completion(system_prompt, user_prompt, tools=TOOLS_DEF)
     tool_calls = msg.get("tool_calls")

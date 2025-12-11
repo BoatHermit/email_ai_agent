@@ -8,6 +8,8 @@ class ToolContext:
     user_id: str
     question: str
     current_thread_id: Optional[str] = None
+    chat_id: str = "default"
+    chat_history: Optional[str] = None
 
 
 @dataclass

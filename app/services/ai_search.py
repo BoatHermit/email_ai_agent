@@ -128,6 +128,7 @@ def ai_search(
         user_id: str,
         question: str,
         current_thread_text: Optional[str] = None,
+        chat_history: Optional[str] = None,
         max_results: int = 20,
 ) -> List[EmailFragment]:
     """
@@ -138,7 +139,11 @@ def ai_search(
     4) 简单 heuristic rerank
     """
     # 1. Query rewrite
-    reformulated = _llm_query_rewrite(question, chat_history=None, current_thread=current_thread_text)
+    reformulated = _llm_query_rewrite(
+        question,
+        chat_history=chat_history,
+        current_thread=current_thread_text,
+    )
     # reformulated = question
     # 2. Feature extraction
     features = _llm_feature_extract(reformulated)

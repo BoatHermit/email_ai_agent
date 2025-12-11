@@ -14,6 +14,8 @@ def answer_question(
         user_id: str,
         question: str,
         current_thread_id: Optional[str] = None,
+        chat_id: str = "default",
+        chat_history: Optional[str] = None,
 ) -> Tuple[str, List[SourceFragment]]:
     """
     High-level pipeline:
@@ -25,6 +27,8 @@ def answer_question(
         user_id=user_id,
         question=question,
         current_thread_id=current_thread_id,
+        chat_id=chat_id,
+        chat_history=chat_history,
     )
 
     tool_names = pick_tools(ctx)
@@ -61,7 +65,9 @@ def answer_question(
         "If you don't know, say so. "
         "Be concise but complete; you can propose next actions (like 'I can draft a reply')."
     )
+    history_block = f"\n--- Chat history ---\n{chat_history}" if chat_history else ""
     user_prompt = (
+        f"Chat id: {chat_id}{history_block}\n"
         f"User question: {question}\n\n"
         f"--- Tool context ---\n{context_text}\n\n"
         "Now answer the question. If you reference specific emails, summarize them in your own words."
