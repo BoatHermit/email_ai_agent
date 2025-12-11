@@ -34,6 +34,7 @@ def pick_tools(ctx: ToolContext) -> List[str]:
     system_prompt = (
         "You are a tool selector for an email AI assistant. "
         "Given the user's question and context, choose which tools are needed. "
+        "Always use CurrentThread when the user wants to reply to, draft, or summarize the current email. "
         "Return JSON via the select_tools function."
     )
     history_block = f"\nChat history:\n{ctx.chat_history}" if ctx.chat_history else ""
@@ -45,22 +46,36 @@ def pick_tools(ctx: ToolContext) -> List[str]:
 
     msg = chat_completion(system_prompt, user_prompt, tools=TOOLS_DEF)
     tool_calls = msg.get("tool_calls")
+
+    def needs_current_thread(question: str) -> bool:
+        q = question.lower()
+        reply_terms = ["reply", "respond", "response", "draft", "write back", "answer", "summarize"]
+        chinese_reply_terms = ["回信", "回复", "回邮件", "回覆", "拟一封", "写封", "写一封"]
+        return any(term in q for term in reply_terms) or any(term in question for term in chinese_reply_terms)
+
+    def ensure_current_thread(selected: List[str]) -> List[str]:
+        if needs_current_thread(ctx.question) and "CurrentThread" not in selected:
+            selected = selected + ["CurrentThread"]
+        return selected
+
     if not tool_calls:
         # simple heuristic fallback
         if "free time" in ctx.question.lower() or "availability" in ctx.question.lower():
             return ["Calendar", "Compose"]
         if "summarize" in ctx.question.lower():
             return ["CurrentThread"]
-        return ["EmailHistory"]
+        base = ["EmailHistory"]
+        return ensure_current_thread(base)
 
     # parse function arguments
     for call in tool_calls:
         if call["function"]["name"] == "select_tools":
             import json
             args = json.loads(call["function"]["arguments"])
-            return args.get("tools", [])
+            selected = args.get("tools", [])
+            return ensure_current_thread(selected)
 
-    return ["EmailHistory"]
+    return ensure_current_thread(["EmailHistory"])
 
 
 def instantiate_tools(db: Session, tool_names: List[str]):

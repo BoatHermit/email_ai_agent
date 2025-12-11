@@ -42,7 +42,7 @@ class EmailListItem(BaseModel):
     is_promotion: bool = False
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class EmailListResponse(BaseModel):
@@ -50,3 +50,22 @@ class EmailListResponse(BaseModel):
     total: int
     page: int
     page_size: int
+
+
+class EmailDetailResponse(BaseModel):
+    id: int
+    external_id: str
+    thread_id: str
+    subject: str
+    sender: str
+    recipients: List[str]
+    cc: Optional[List[str]] = None
+    bcc: Optional[List[str]] = None
+    labels: Optional[List[str]] = None
+    body_text: str
+    ts: datetime
+    importance_score: float = 0.0
+    is_promotion: bool = False
+
+    class Config:
+        from_attributes = True

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email AI Agent</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo">📧 Email AI Agent</div>
+    <div class="top-actions">
+      <label class="inline-label">
+        API
+        <input id="apiBaseInput" type="text" value="http://localhost:8000" spellcheck="false">
+      </label>
+      <label class="inline-label">
+        User
+        <input id="userIdInput" type="text" value="demo" spellcheck="false">
+      </label>
+      <button id="refreshButton">刷新邮件</button>
+      <button id="newChatButton" class="ghost">新建聊天</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="mail-pane">
+      <div class="mail-toolbar">
+        <div class="search">
+          <input id="searchInput" type="search" placeholder="搜索主题或发件人...">
+        </div>
+        <div class="pager">
+          <button id="prevPage">上一页</button>
+          <span id="pageInfo">第 1 页</span>
+          <button id="nextPage">下一页</button>
+        </div>
+      </div>
+
+      <div id="emailList" class="email-list"></div>
+      <div id="emailDetail" class="email-detail empty">
+        <div class="placeholder">选择一封邮件查看详情</div>
+      </div>
+    </section>
+
+    <section class="chat-pane">
+      <div class="chat-header">
+        <div>
+          <div class="chat-title">AI 助手</div>
+          <div class="chat-subtitle">引用邮箱内容并回答你的问题</div>
+        </div>
+        <div class="chat-actions">
+          <button id="clearChatButton" class="ghost">清空聊天</button>
+        </div>
+      </div>
+
+      <div id="chatHistory" class="chat-history"></div>
+
+      <div class="chat-input">
+        <textarea id="chatInput" rows="3" placeholder="向 AI 提问，右侧会显示回答和引用的邮件片段..."></textarea>
+        <button id="sendButton">发送</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="statusBar" class="status-bar"></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

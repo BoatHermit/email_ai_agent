@@ -3,6 +3,7 @@ from .email import (
     EmailIngestResponse,
     EmailListItem,
     EmailListResponse,
+    EmailDetailResponse,
 )
 from .qa import AskRequest, AskResponse, SourceFragment
 from .ingestion import (

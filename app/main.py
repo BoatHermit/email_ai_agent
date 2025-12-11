@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import ai, emails, gmail, ingestion, outlook
 from app.db import models
@@ -10,6 +11,15 @@ from app.services.search_index_es import ensure_email_index
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Email AI Agent (Shortwave-style) with ES & Multitenancy")
+
+# Allow local web frontend to call the API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(ingestion.router)
 app.include_router(emails.router)

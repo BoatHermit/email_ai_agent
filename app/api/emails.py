@@ -1,10 +1,15 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 
 from app import deps
 from app.api.dependencies import get_db
 from app.db import models
-from app.schemas import EmailIngestRequest, EmailIngestResponse, EmailListResponse
+from app.schemas import (
+    EmailDetailResponse,
+    EmailIngestRequest,
+    EmailIngestResponse,
+    EmailListResponse,
+)
 from app.services.email_ingest import ingest_emails
 
 router = APIRouter(prefix="/emails", tags=["emails"])
@@ -68,4 +73,35 @@ def list_emails(
         total=total,
         page=page,
         page_size=page_size,
+    )
+
+
+@router.get("/{email_id}", response_model=EmailDetailResponse)
+def get_email(
+    email_id: int,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(deps.get_current_user_id),
+):
+    row = (
+        db.query(models.Email)
+        .filter(models.Email.user_id == user_id, models.Email.id == email_id)
+        .first()
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail="email not found")
+
+    return EmailDetailResponse(
+        id=row.id,
+        external_id=row.external_id,
+        thread_id=row.thread_id,
+        subject=row.subject,
+        sender=row.sender,
+        recipients=_split_csv(row.recipients),
+        cc=_split_csv(row.cc),
+        bcc=_split_csv(row.bcc),
+        labels=_split_csv(row.labels),
+        body_text=row.body_text or "",
+        ts=row.ts,
+        importance_score=row.importance_score or 0.0,
+        is_promotion=bool(row.is_promotion),
     )

@@ -14,19 +14,35 @@ class CurrentThreadTool(BaseTool):
             return ToolResult(name=self.name, content="", metadata={})
 
         rec = (
-            self.db.query(models.CurrentThreadContext)
+            self.db.query(models.Email)
             .filter(
-                models.CurrentThreadContext.user_id == ctx.user_id,
-                models.CurrentThreadContext.thread_id == ctx.current_thread_id,
+                models.Email.user_id == ctx.user_id,
+                models.Email.thread_id == ctx.current_thread_id,
                 )
-            .order_by(models.CurrentThreadContext.updated_at.desc())
+            .order_by(models.Email.ts.desc())
             .first()
         )
         if not rec:
             return ToolResult(name=self.name, content="", metadata={})
 
+        header_lines = [
+            f"Subject: {rec.subject or ''}",
+            f"From: {rec.sender or ''}",
+            f"To: {rec.recipients or ''}",
+            f"Cc: {rec.cc or ''}",
+            f"Bcc: {rec.bcc or ''}",
+        ]
+        content = "\n".join(header_lines) + "\n\n" + (rec.body_text or "")
+
         return ToolResult(
             name=self.name,
-            content=rec.context_text,
-            metadata={"thread_id": ctx.current_thread_id},
+            content=content,
+            metadata={
+                "thread_id": ctx.current_thread_id,
+                "subject": rec.subject,
+                "sender": rec.sender,
+                "recipients": rec.recipients,
+                "cc": rec.cc,
+                "bcc": rec.bcc,
+            },
         )

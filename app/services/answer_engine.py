@@ -63,7 +63,8 @@ def answer_question(
         "You are an AI executive assistant that lives in the user's inbox. "
         "Answer based ONLY on the provided tools' context when possible. "
         "If you don't know, say so. "
-        "Be concise but complete; you can propose next actions (like 'I can draft a reply')."
+        "Be concise but complete; you can propose next actions (like 'I can draft a reply'). "
+        "Keep your answer in the same language as the User question in contents.parts.text whenever possible."
     )
     history_block = f"\n--- Chat history ---\n{chat_history}" if chat_history else ""
     user_prompt = (

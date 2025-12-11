@@ -37,16 +37,6 @@ Index("ix_email_user_external", Email.user_id, Email.external_id)
 Index("ix_email_user_thread", Email.user_id, Email.thread_id)
 
 
-class CurrentThreadContext(Base):
-    __tablename__ = "current_thread_context"
-
-    id = Column(Integer, primary_key=True)
-    user_id = Column(String, index=True)
-    thread_id = Column(String, index=True)
-    context_text = Column(Text)
-    updated_at = Column(DateTime, default=datetime.utcnow)
-
-
 class IngestionSession(Base):
     """
     用于首次全量导入的会话状态，支持断点续传。
