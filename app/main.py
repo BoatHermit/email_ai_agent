@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.db.session import engine, SessionLocal
@@ -11,6 +11,7 @@ from app.schemas import (
     AskRequest,
     AskResponse,
     SourceFragment,
+    EmailListResponse,
     FullIngestionStartRequest,
     FullIngestionStartResponse,
     FullIngestionBatchRequest,
@@ -158,6 +159,56 @@ def ingest_endpoint(
 ):
     count = ingest_emails(db, user_id, payload.emails)
     return EmailIngestResponse(ingested=count)
+
+
+@app.get("/emails", response_model=EmailListResponse)
+def list_emails(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+    user_id: str = Depends(deps.get_current_user_id),
+):
+    """
+    分页查询当前用户的邮件，按时间逆序排列。
+    """
+    base_q = db.query(models.Email).filter(models.Email.user_id == user_id)
+    total = base_q.count()
+    rows = (
+        base_q.order_by(models.Email.ts.desc(), models.Email.id.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
+
+    def _split_csv(val: str) -> list[str]:
+        return [v for v in val.split(",") if v] if val else []
+
+    items = []
+    for e in rows:
+        items.append(
+            {
+                "id": e.id,
+                "external_id": e.external_id,
+                "thread_id": e.thread_id,
+                "subject": e.subject,
+                "sender": e.sender,
+                "recipients": _split_csv(e.recipients),
+                "cc": _split_csv(e.cc),
+                "bcc": _split_csv(e.bcc),
+                "labels": _split_csv(e.labels),
+                "body_snippet": (e.body_text or "")[:200],
+                "ts": e.ts,
+                "importance_score": e.importance_score or 0.0,
+                "is_promotion": bool(e.is_promotion),
+            }
+        )
+
+    return EmailListResponse(
+        items=items,
+        total=total,
+        page=page,
+        page_size=page_size,
+    )
 
 
 @app.post("/ai/ask", response_model=AskResponse)
