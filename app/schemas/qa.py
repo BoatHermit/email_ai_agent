@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -17,3 +18,23 @@ class SourceFragment(BaseModel):
 class AskResponse(BaseModel):
     answer: str
     sources: List[SourceFragment]
+
+
+class ChatSessionItem(BaseModel):
+    chat_id: str
+    title: Optional[str] = None
+    created_at: datetime
+
+
+class ChatSessionListResponse(BaseModel):
+    items: List[ChatSessionItem]
+
+
+class ChatMessageItem(BaseModel):
+    role: str
+    content: str
+    created_at: datetime
+
+
+class ChatMessageListResponse(BaseModel):
+    items: List[ChatMessageItem]

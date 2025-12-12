@@ -5,7 +5,15 @@ from .email import (
     EmailListResponse,
     EmailDetailResponse,
 )
-from .qa import AskRequest, AskResponse, SourceFragment
+from .qa import (
+    AskRequest,
+    AskResponse,
+    ChatSessionItem,
+    ChatSessionListResponse,
+    ChatMessageItem,
+    ChatMessageListResponse,
+    SourceFragment,
+)
 from .ingestion import (
     FullIngestionStartRequest,
     FullIngestionStartResponse,

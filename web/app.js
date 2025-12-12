@@ -10,6 +10,10 @@
   const refreshButton = document.getElementById("refreshButton");
   const newChatButton = document.getElementById("newChatButton");
   const clearChatButton = document.getElementById("clearChatButton");
+  const chatSessionsButton = document.getElementById("chatSessionsButton");
+  const chatHistoryModal = document.getElementById("chatHistoryModal");
+  const closeChatHistoryButton = document.getElementById("closeChatHistoryButton");
+  const chatSessionsList = document.getElementById("chatSessionsList");
   const chatHistory = document.getElementById("chatHistory");
   const chatInput = document.getElementById("chatInput");
   const sendButton = document.getElementById("sendButton");
@@ -24,6 +28,7 @@
     selectedEmail: null,
     chatMessages: [],
     chatId: loadFromStorage("chatId") || `chat-${Date.now()}`,
+    chatSessions: [],
   };
 
   apiBaseInput.value = loadFromStorage("apiBase") || apiBaseInput.value;
@@ -216,6 +221,30 @@
     chatHistory.scrollTop = chatHistory.scrollHeight;
   }
 
+  function renderChatSessions() {
+    chatSessionsList.innerHTML = "";
+    if (!state.chatSessions.length) {
+      chatSessionsList.innerHTML = '<div class="placeholder">暂无聊天记录</div>';
+      return;
+    }
+    state.chatSessions.forEach((s) => {
+      const item = document.createElement("div");
+      item.className = "session-item";
+      if (s.chat_id === state.chatId) {
+        item.classList.add("active");
+      }
+      item.innerHTML = `
+        <div class="session-title">${escapeHtml(s.title || "(未命名会话)")}</div>
+        <div class="session-meta">
+          <span>${escapeHtml(s.chat_id || "")}</span>
+          <span>${formatDate(s.created_at)}</span>
+        </div>
+      `;
+      item.onclick = () => selectChatSession(s.chat_id);
+      chatSessionsList.appendChild(item);
+    });
+  }
+
   async function sendMessage() {
     const question = chatInput.value.trim();
     if (!question) return;
@@ -296,6 +325,61 @@
     return htmlLines.join("\n");
   }
 
+  async function openChatHistoryModal() {
+    chatHistoryModal.classList.remove("hidden");
+    chatSessionsList.innerHTML = '<div class="placeholder">正在加载聊天历史...</div>';
+    try {
+      const res = await fetch(`${getApiBase()}/ai/chat-sessions?limit=200`, {
+        headers: {
+          "X-User-Id": getUserId(),
+        },
+      });
+      if (!res.ok) {
+        throw new Error(`加载聊天历史失败：${res.status}`);
+      }
+      const data = await res.json();
+      state.chatSessions = data.items || [];
+      renderChatSessions();
+      setStatus("聊天历史已加载");
+    } catch (err) {
+      chatSessionsList.innerHTML = `<div class="placeholder">${escapeHtml(
+        err.message || "加载聊天历史失败"
+      )}</div>`;
+      setStatus(err.message || "加载聊天历史失败", "error");
+    }
+  }
+
+  function closeChatHistoryModal() {
+    chatHistoryModal.classList.add("hidden");
+  }
+
+  async function selectChatSession(chatId) {
+    closeChatHistoryModal();
+    state.chatId = chatId;
+    saveToStorage("chatId", chatId);
+    setStatus("正在加载聊天记录...", "info", null);
+    try {
+      const res = await fetch(
+        `${getApiBase()}/ai/chat-messages?chat_id=${encodeURIComponent(chatId)}&limit=200`,
+        {
+          headers: { "X-User-Id": getUserId() },
+        }
+      );
+      if (!res.ok) {
+        throw new Error(`加载聊天记录失败：${res.status}`);
+      }
+      const data = await res.json();
+      state.chatMessages = (data.items || []).map((m) => ({
+        role: m.role === "assistant" ? "bot" : "user",
+        content: m.content,
+      }));
+      renderChat();
+      setStatus(`已切换到会话 ${chatId}`);
+    } catch (err) {
+      setStatus(err.message || "加载聊天记录失败", "error");
+    }
+  }
+
   function resetChat(newChatId = null) {
     state.chatMessages = [];
     state.chatId = newChatId || `chat-${Date.now()}`;
@@ -331,6 +415,13 @@
     });
     newChatButton.onclick = () => resetChat();
     clearChatButton.onclick = () => resetChat(state.chatId);
+    chatSessionsButton.onclick = openChatHistoryModal;
+    closeChatHistoryButton.onclick = closeChatHistoryModal;
+    chatHistoryModal.addEventListener("click", (e) => {
+      if (e.target === chatHistoryModal) {
+        closeChatHistoryModal();
+      }
+    });
     apiBaseInput.onchange = () => saveToStorage("apiBase", getApiBase());
     userIdInput.onchange = () => saveToStorage("userId", getUserId());
   }

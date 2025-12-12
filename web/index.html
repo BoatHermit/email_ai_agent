@@ -19,7 +19,6 @@
         <input id="userIdInput" type="text" value="demo" spellcheck="false">
       </label>
       <button id="refreshButton">刷新邮件</button>
-      <button id="newChatButton" class="ghost">新建聊天</button>
     </div>
   </header>
 
@@ -52,7 +51,9 @@
           <div class="chat-subtitle">引用邮箱内容并回答你的问题</div>
         </div>
         <div class="chat-actions">
+          <button id="chatSessionsButton" class="ghost">聊天历史</button>
           <button id="clearChatButton" class="ghost">清空聊天</button>
+          <button id="newChatButton" class="ghost">新建聊天</button>
         </div>
       </div>
 
@@ -66,6 +67,19 @@
   </main>
 
   <div id="statusBar" class="status-bar"></div>
+
+  <div id="chatHistoryModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">聊天历史</div>
+          <div class="modal-subtitle">展示当前用户的会话标题与创建时间</div>
+        </div>
+        <button id="closeChatHistoryButton" class="ghost icon-btn" aria-label="关闭聊天历史">×</button>
+      </div>
+      <div id="chatSessionsList" class="modal-body"></div>
+    </div>
+  </div>
 
   <script src="./app.js"></script>
 </body>
