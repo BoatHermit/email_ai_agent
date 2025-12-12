@@ -5,12 +5,14 @@ from pydantic import BaseModel
 
 
 class GmailConnectRequest(BaseModel):
+    email: str
     access_token: str
     refresh_token: Optional[str] = None
     days_back: int = 90
 
 
 class GmailSyncRequest(BaseModel):
+    email: str
     access_token: Optional[str] = None
     refresh_token: Optional[str] = None
     fallback_days_back: int = 7

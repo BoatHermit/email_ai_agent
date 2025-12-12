@@ -19,7 +19,18 @@
   const chatInput = document.getElementById("chatInput");
   const sendButton = document.getElementById("sendButton");
   const statusBar = document.getElementById("statusBar");
+  const userCenterButton = document.getElementById("userCenterButton");
+  const userCenterModal = document.getElementById("userCenterModal");
+  const closeUserCenterButton = document.getElementById("closeUserCenterButton");
+  const connectGmailButton = document.getElementById("connectGmailButton");
+  const gmailClientIdInput = document.getElementById("gmailClientIdInput");
+  const gmailRedirectInput = document.getElementById("gmailRedirectInput");
+  const mailboxesList = document.getElementById("mailboxesList");
   let statusTimer = null;
+
+  const GMAIL_CLIENT_ID =
+    "654999043656-m1nk36prvumftarm2vmuvnqfh685r9kj.apps.googleusercontent.com";
+  const GMAIL_REDIRECT_URI = "http://localhost:3000/oauth-callback.html";
 
   const state = {
     page: 1,
@@ -32,9 +43,20 @@
     chatSessions: [],
     userId: loadFromStorage("userId"),
     authToken: loadFromStorage("authToken"),
+    mailboxes: [],
+    pendingGmailState: null,
+    pendingGmailAction: null,
   };
 
   apiBaseInput.value = loadFromStorage("apiBase") || apiBaseInput.value;
+  if (gmailClientIdInput) {
+    gmailClientIdInput.value = GMAIL_CLIENT_ID;
+    gmailClientIdInput.readOnly = true;
+  }
+  if (gmailRedirectInput) {
+    gmailRedirectInput.value = GMAIL_REDIRECT_URI;
+    gmailRedirectInput.readOnly = true;
+  }
 
   function saveToStorage(key, value) {
     try {
@@ -83,6 +105,10 @@
 
   function getApiBase() {
     return apiBaseInput.value.replace(/\/+$/, "");
+  }
+
+  function getDefaultRedirectUri() {
+    return GMAIL_REDIRECT_URI;
   }
 
   function authHeaders(extra = {}) {
@@ -412,6 +438,223 @@
     setStatus(`已切换 chat_id: ${state.chatId}`);
   }
 
+  async function fetchMailboxes() {
+    if (!mailboxesList) return;
+    mailboxesList.innerHTML = '<div class="placeholder">正在加载邮箱...</div>';
+    try {
+      const res = await apiFetch(`${getApiBase()}/mailboxes`);
+      if (!res.ok) {
+        const detail = await res.text();
+        throw new Error(detail || `加载失败 ${res.status}`);
+      }
+      const data = await res.json();
+      state.mailboxes = data.items || [];
+      renderMailboxes();
+    } catch (err) {
+      mailboxesList.innerHTML = `<div class="placeholder">${escapeHtml(err.message || "加载邮箱失败")}</div>`;
+      setStatus(err.message || "加载邮箱失败", "error");
+    }
+  }
+
+  function renderMailboxes() {
+    if (!mailboxesList) return;
+    mailboxesList.innerHTML = "";
+    if (!state.mailboxes.length) {
+      mailboxesList.classList.add("placeholder");
+      mailboxesList.textContent = "暂无已链接邮箱";
+      return;
+    }
+    mailboxesList.classList.remove("placeholder");
+    state.mailboxes.forEach((m) => {
+      const item = document.createElement("div");
+      item.className = "mailbox-item";
+
+      const info = document.createElement("div");
+      info.className = "mailbox-info";
+
+      const title = document.createElement("div");
+      title.className = "subject";
+      title.textContent = m.provider || "";
+
+      const meta = document.createElement("div");
+      meta.className = "mailbox-meta";
+      const typeTag = document.createElement("span");
+      typeTag.className = "tag";
+      typeTag.textContent = (m.provider_type || "gmail").toUpperCase();
+      meta.appendChild(typeTag);
+      const lastSync = document.createElement("span");
+      lastSync.textContent = `最近同步：${formatDate(m.last_synced_at) || "未同步"}`;
+      meta.appendChild(lastSync);
+      const createdAt = document.createElement("span");
+      createdAt.textContent = `创建：${formatDate(m.created_at)}`;
+      meta.appendChild(createdAt);
+      info.appendChild(title);
+      info.appendChild(meta);
+
+      const actions = document.createElement("div");
+      actions.className = "mailbox-actions";
+      const syncBtn = document.createElement("button");
+      syncBtn.className = "ghost";
+      syncBtn.textContent = "同步";
+      syncBtn.onclick = () => syncMailboxWithRetry(m);
+      actions.appendChild(syncBtn);
+
+      item.appendChild(info);
+      item.appendChild(actions);
+      mailboxesList.appendChild(item);
+    });
+  }
+
+  function openUserCenter() {
+    if (!userCenterModal) return;
+    if (gmailRedirectInput && !gmailRedirectInput.value) {
+      gmailRedirectInput.value = getDefaultRedirectUri();
+    }
+    userCenterModal.classList.remove("hidden");
+    fetchMailboxes();
+  }
+
+  function closeUserCenter() {
+    if (!userCenterModal) return;
+    userCenterModal.classList.add("hidden");
+  }
+
+  function startGmailOAuth(action = { type: "connect" }) {
+    const clientId = GMAIL_CLIENT_ID;
+    const redirectUri = GMAIL_REDIRECT_URI;
+    const stateToken = `gmail-${Date.now()}`;
+    state.pendingGmailState = stateToken;
+    state.pendingGmailAction = action;
+    const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
+    authUrl.searchParams.set("client_id", clientId);
+    authUrl.searchParams.set("redirect_uri", redirectUri);
+    authUrl.searchParams.set("response_type", "token");
+    authUrl.searchParams.set(
+      "scope",
+      "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/userinfo.email"
+    );
+    authUrl.searchParams.set("prompt", "consent");
+    authUrl.searchParams.set("include_granted_scopes", "true");
+    authUrl.searchParams.set("state", stateToken);
+    window.open(authUrl.toString(), "gmail_oauth", "width=520,height=700");
+  }
+
+  async function handleGmailAccessToken(accessToken, refreshToken = null) {
+    if (!accessToken) {
+      setStatus("未获取到 Gmail access_token", "error");
+      return;
+    }
+    setStatus("正在获取 Gmail 账户信息...", "info");
+    try {
+      const profileRes = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/profile", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (!profileRes.ok) {
+        const detail = await profileRes.text();
+        throw new Error(detail || `无法获取 Gmail 邮箱 (${profileRes.status})`);
+      }
+      const profile = await profileRes.json();
+      const email = (profile && profile.emailAddress) || "";
+      if (!email) {
+        throw new Error("未能获取邮箱账号");
+      }
+      const pendingAction = state.pendingGmailAction || { type: "connect" };
+      state.pendingGmailAction = null;
+      if (pendingAction.type === "sync" && pendingAction.email) {
+        const target = (pendingAction.email || "").toLowerCase();
+        if (target && target !== email.toLowerCase()) {
+          throw new Error("授权邮箱与待同步邮箱不一致");
+        }
+      }
+      if (pendingAction.type === "sync") {
+        await callGmailSync(email, { access_token: accessToken, refresh_token: refreshToken });
+        setStatus(`${email} 已同步`);
+      } else {
+        await callGmailConnect(email, accessToken, refreshToken);
+      }
+      await fetchMailboxes();
+      await fetchEmails();
+    } catch (err) {
+      setStatus(err.message || "Gmail 授权失败", "error");
+    }
+  }
+
+  async function callGmailConnect(email, accessToken, refreshToken) {
+    const res = await apiFetch(`${getApiBase()}/gmail/connect`, {
+      method: "POST",
+      headers: authHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({
+        email,
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        days_back: 90,
+      }),
+    });
+    if (!res.ok) {
+      const detail = await res.text();
+      throw new Error(detail || `Gmail connect 失败 (${res.status})`);
+    }
+    const data = await res.json();
+    setStatus(`Gmail 链接成功，已抓取 ${data.ingested || 0} 封邮件`, "info");
+    return data;
+  }
+
+  async function callGmailSync(email, tokens = null) {
+    const payload = {
+      email,
+      fallback_days_back: 7,
+    };
+    if (tokens && tokens.access_token) {
+      payload.access_token = tokens.access_token;
+    }
+    if (tokens && tokens.refresh_token) {
+      payload.refresh_token = tokens.refresh_token;
+    }
+    const res = await apiFetch(`${getApiBase()}/gmail/sync`, {
+      method: "POST",
+      headers: authHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const detail = await res.text();
+      const err = new Error(detail || `同步失败 (${res.status})`);
+      err.status = res.status;
+      throw err;
+    }
+    const data = await res.json();
+    setStatus(`同步完成：新增 ${data.ingested || 0} 封`, "info");
+    return data;
+  }
+
+  async function syncMailboxWithRetry(mailbox) {
+    const email = mailbox.provider;
+    try {
+      await callGmailSync(email);
+      await fetchMailboxes();
+      await fetchEmails();
+      setStatus(`${email} 已同步`);
+    } catch (err) {
+      setStatus((err && err.message) || "同步失败，尝试重新授权", "error");
+      state.pendingGmailAction = { type: "sync", email };
+      startGmailOAuth({ type: "sync", email });
+    }
+  }
+
+  function handleWindowMessage(event) {
+    const data = event.data || {};
+    if (data.source !== "gmail-oauth") return;
+    if (state.pendingGmailState && data.state && data.state !== state.pendingGmailState) {
+      setStatus("Gmail OAuth 状态不匹配", "error");
+      return;
+    }
+    state.pendingGmailState = null;
+    if (data.error) {
+      setStatus(`Gmail 授权失败：${data.error_description || data.error}`, "error");
+      return;
+    }
+    handleGmailAccessToken(data.access_token, data.refresh_token);
+  }
+
   function bindEvents() {
     refreshButton.onclick = () => {
       state.page = 1;
@@ -446,6 +689,22 @@
         closeChatHistoryModal();
       }
     });
+    if (userCenterButton) {
+      userCenterButton.onclick = openUserCenter;
+    }
+    if (closeUserCenterButton) {
+      closeUserCenterButton.onclick = closeUserCenter;
+    }
+    if (userCenterModal) {
+      userCenterModal.addEventListener("click", (e) => {
+        if (e.target === userCenterModal) {
+          closeUserCenter();
+        }
+      });
+    }
+    if (connectGmailButton) {
+      connectGmailButton.onclick = () => startGmailOAuth({ type: "connect" });
+    }
     apiBaseInput.onchange = () => saveToStorage("apiBase", getApiBase());
     logoutButton.onclick = () => {
       clearSession();
@@ -456,9 +715,11 @@
   function init() {
     if (!requireAuth()) return;
     bindEvents();
+    window.addEventListener("message", handleWindowMessage);
     renderEmails();
     renderChat();
     fetchEmails();
+    fetchMailboxes();
   }
 
   init();

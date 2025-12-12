@@ -10,15 +10,32 @@ from app.services.email_ingest import ingest_emails
 from app.services.gmail_client import fetch_gmail_messages, default_since_days
 
 
-def _get_or_create_state(db: Session, user_id: str, provider: str = "gmail") -> models.MailboxSyncState:
+def _get_or_create_state(db: Session, user_id: str, email: str, legacy_provider: str = "gmail") -> models.MailboxSyncState:
+    """
+    provider 字段现在保存邮箱账号。这里尝试用邮箱命中；如果命中旧数据会自动迁移。
+    """
+    email_key = email.lower()
     state = (
         db.query(models.MailboxSyncState)
-        .filter(models.MailboxSyncState.user_id == user_id, models.MailboxSyncState.provider == provider)
+        .filter(models.MailboxSyncState.user_id == user_id, models.MailboxSyncState.provider == email_key)
         .first()
     )
     if state:
         return state
-    state = models.MailboxSyncState(user_id=user_id, provider=provider)
+
+    legacy_state = (
+        db.query(models.MailboxSyncState)
+        .filter(models.MailboxSyncState.user_id == user_id, models.MailboxSyncState.provider == legacy_provider)
+        .first()
+    )
+    if legacy_state:
+        legacy_state.provider = email_key
+        db.add(legacy_state)
+        db.commit()
+        db.refresh(legacy_state)
+        return legacy_state
+
+    state = models.MailboxSyncState(user_id=user_id, provider=email_key)
     db.add(state)
     db.commit()
     db.refresh(state)
@@ -29,11 +46,12 @@ def initial_gmail_import(
     db: Session,
     *,
     user_id: str,
+    email: str,
     access_token: str,
     refresh_token: Optional[str] = None,
     days_back: int = 90,
 ) -> Tuple[int, Optional[str], Optional[datetime]]:
-    state = _get_or_create_state(db, user_id=user_id, provider="gmail")
+    state = _get_or_create_state(db, user_id=user_id, email=email, legacy_provider="gmail")
     state.access_token = access_token
     state.refresh_token = refresh_token
     db.add(state)
@@ -58,11 +76,12 @@ def sync_gmail_incremental(
     db: Session,
     *,
     user_id: str,
+    email: str,
     access_token: Optional[str] = None,
     refresh_token: Optional[str] = None,
     fallback_days_back: int = 7,
 ) -> Tuple[int, Optional[str], Optional[datetime]]:
-    state = _get_or_create_state(db, user_id=user_id, provider="gmail")
+    state = _get_or_create_state(db, user_id=user_id, email=email, legacy_provider="gmail")
     token_to_use = access_token or state.access_token
     if not token_to_use:
         raise RuntimeError("No Gmail access token available for sync")

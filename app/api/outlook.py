@@ -21,6 +21,7 @@ def outlook_connect(
     ingested, delta_link, last_synced_at = initial_outlook_import(
         db,
         user_id=user_id,
+        email=payload.email,
         access_token=payload.access_token,
         refresh_token=payload.refresh_token,
         days_back=payload.days_back,
@@ -42,6 +43,7 @@ def outlook_sync(
     ingested, delta_link, last_synced_at = sync_outlook_incremental(
         db,
         user_id=user_id,
+        email=payload.email,
         access_token=payload.access_token,
         refresh_token=payload.refresh_token,
         fallback_days_back=payload.fallback_days_back,

@@ -15,6 +15,7 @@
         <input id="apiBaseInput" type="text" value="http://localhost:8000" spellcheck="false">
       </label>
       <div class="user-greeting">Hello, <span id="userGreeting"></span></div>
+      <button id="userCenterButton" class="ghost">用户中心</button>
       <button id="logoutButton" class="ghost">退出登录</button>
       <button id="refreshButton">刷新邮件</button>
     </div>
@@ -76,6 +77,36 @@
         <button id="closeChatHistoryButton" class="ghost icon-btn" aria-label="关闭聊天历史">×</button>
       </div>
       <div id="chatSessionsList" class="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="userCenterModal" class="modal hidden">
+    <div class="modal-content wide">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">用户中心</div>
+          <div class="modal-subtitle">查看 / 管理已授权邮箱账号，支持 Gmail OAuth 重新授权与同步。</div>
+        </div>
+        <button id="closeUserCenterButton" class="ghost icon-btn" aria-label="关闭用户中心">×</button>
+      </div>
+      <div class="modal-body user-center-body">
+        <div class="user-center-section">
+          <div class="section-head">
+            <div>
+          <div class="section-title">链接 Gmail</div>
+          <!-- <div class="section-desc">使用 OAuth2.0 授权，成功后会自动调用后台 /gmail/connect。</div> -->
+        </div>
+        <button id="connectGmailButton">链接 Gmail</button>
+      </div>
+    </div>
+        <div class="user-center-section">
+          <div class="section-head">
+            <div class="section-title">已链接邮箱</div>
+            <!-- <div class="section-desc">显示 mailbox_sync_state 中已保存的账号；点击同步会调用 /gmail/sync。</div> -->
+          </div>
+          <div id="mailboxesList" class="mailbox-list placeholder">暂无数据</div>
+        </div>
+      </div>
     </div>
   </div>
 

@@ -72,6 +72,7 @@
 - 请求体：
   ```json
   {
+    "email": "user@gmail.com",
     "access_token": "string",
     "refresh_token": "string|null",
     "days_back": 90
@@ -91,6 +92,7 @@
 - 请求体：
   ```json
   {
+    "email": "user@gmail.com",
     "access_token": "string|null",
     "refresh_token": "string|null",
     "fallback_days_back": 7
@@ -105,6 +107,7 @@
 - 请求体：
   ```json
   {
+    "email": "user@outlook.com",
     "access_token": "string",
     "refresh_token": "string|null",
     "days_back": 90
@@ -124,12 +127,35 @@
 - 请求体：
   ```json
   {
+    "email": "user@outlook.com",
     "access_token": "string|null",
     "refresh_token": "string|null",
     "fallback_days_back": 7
   }
   ```
 - 响应体同上（`delta_link` 表示最新游标）。
+
+## 邮箱状态查询
+
+### GET /mailboxes
+- 作用：返回当前用户的 `mailbox_sync_state` 列表，`provider` 为邮箱账号。
+- 响应体：
+  ```json
+  {
+    "items": [
+      {
+        "provider": "user@gmail.com",
+        "provider_type": "gmail",
+        "last_synced_at": "ISO8601|null",
+        "created_at": "ISO8601",
+        "updated_at": "ISO8601",
+        "has_refresh_token": true,
+        "has_access_token": true,
+        "delta_link": "historyId 或 delta_link"
+      }
+    ]
+  }
+  ```
 
 ## 全量导入（批处理）
 
@@ -148,5 +174,5 @@
 - 响应体：`FullIngestionStatusResponse`（状态、`checkpoint_token`、`processed_count`、`last_error` 等）。
 
 ## 同步状态持久化
-- 状态表：`mailbox_sync_state`（`provider`="gmail"/"outlook"），持久保存 `access_token`、`refresh_token`、`delta_link/historyId`、`last_synced_at`，用于增量续传。
+- 状态表：`mailbox_sync_state`，`provider` 字段保存邮箱账号（如 `user@gmail.com`），持久保存 `access_token`、`refresh_token`、`delta_link/historyId`、`last_synced_at`，用于增量续传。
 - 聊天表：`chat_messages`、`chat_sessions`，按 `chat_id` 记录消息和生成的标题。

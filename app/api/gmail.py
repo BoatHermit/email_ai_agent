@@ -21,6 +21,7 @@ def gmail_connect(
     ingested, history_id, last_synced_at = initial_gmail_import(
         db,
         user_id=user_id,
+        email=payload.email,
         access_token=payload.access_token,
         refresh_token=payload.refresh_token,
         days_back=payload.days_back,
@@ -42,6 +43,7 @@ def gmail_sync(
     ingested, history_id, last_synced_at = sync_gmail_incremental(
         db,
         user_id=user_id,
+        email=payload.email,
         access_token=payload.access_token,
         refresh_token=payload.refresh_token,
         fallback_days_back=payload.fallback_days_back,

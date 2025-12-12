@@ -1,4 +1,4 @@
-from app.api import ai, auth, emails, gmail, ingestion, outlook
+from app.api import ai, auth, emails, gmail, ingestion, mailbox, outlook
 
 __all__ = [
     "ai",
@@ -6,5 +6,6 @@ __all__ = [
     "emails",
     "gmail",
     "ingestion",
+    "mailbox",
     "outlook",
 ]

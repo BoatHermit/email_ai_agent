@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Gmail OAuth Callback</title>
+</head>
+<body>
+  <script>
+    (() => {
+      function parseHash() {
+        const hash = window.location.hash.replace(/^#/, "");
+        const params = {};
+        if (!hash) return params;
+        hash.split("&").forEach((kv) => {
+          const [k, v = ""] = kv.split("=");
+          params[decodeURIComponent(k)] = decodeURIComponent(v || "");
+        });
+        return params;
+      }
+
+      const data = parseHash();
+      data.source = "gmail-oauth";
+      try {
+        if (window.opener) {
+          window.opener.postMessage(data, "*");
+        }
+      } catch (_) {
+        /* ignore */
+      }
+      document.body.innerHTML = data.access_token
+        ? "<p>授权完成，可以关闭此窗口。</p>"
+        : "<p>未获取到授权信息，请返回重试。</p>";
+      setTimeout(() => {
+        window.close();
+      }, 1200);
+    })();
+  </script>
+</body>
+</html>
