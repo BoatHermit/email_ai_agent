@@ -1,6 +1,28 @@
-version: "3.9"
-
 services:
+  backend:
+    build: .
+    container_name: email-ai-api
+    ports:
+      - "8005:8005"
+    env_file: .env
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      DATABASE_URL: sqlite:///./email_ai.db
+    volumes:
+      - ./email_ai.db:/app/email_ai.db
+    depends_on:
+      - elasticsearch
+
+  frontend:
+    image: nginx:alpine
+    container_name: email-ai-web
+    ports:
+      - "3000:80"
+    volumes:
+      - ./web:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.14.0
     container_name: email-ai-es

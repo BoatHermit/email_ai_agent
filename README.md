@@ -15,15 +15,19 @@ Shortwave-style email AI assistant with ingestion, hybrid search, and tool-based
 
 ## Run
 Fill out `.env` (copy from `.env.example`) with OpenAI/Gemini keys and Elasticsearch URL.
+### Method 1
 ```bash
+# Backend
 pip install -r requirements.txt
 cp .env.example .env  # fill in keys
 uvicorn app.main:app --reload
-```
 
-## Frontend
-Simple static page; serve locally and hit the API.
-```bash
+# Frontend
 cd web
 python -m http.server 3000
+```
+
+### Method 2: docker
+```bash
+docker compose up --build
 ```
