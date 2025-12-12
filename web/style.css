@@ -86,11 +86,23 @@ body {
   min-width: 180px;
 }
 
+.inline-label select {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
 .inline-label.full-width {
   width: 100%;
 }
 
 .inline-label.full-width input {
+  width: 100%;
+}
+
+.inline-label.full-width select {
   width: 100%;
 }
 

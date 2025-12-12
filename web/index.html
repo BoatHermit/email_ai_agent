@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,10 +14,17 @@
         API
         <input id="apiBaseInput" type="text" value="http://localhost:8000" spellcheck="false">
       </label>
-      <div class="user-greeting">Hello, <span id="userGreeting"></span></div>
-      <button id="userCenterButton" class="ghost">用户中心</button>
-      <button id="logoutButton" class="ghost">退出登录</button>
-      <button id="refreshButton">刷新邮件</button>
+      <label class="inline-label">
+        <span id="languageLabel">Language</span>
+        <select id="languageSelect">
+          <option value="en">English</option>
+          <option value="zh-CN">中文</option>
+        </select>
+      </label>
+      <div class="user-greeting"><span id="greetingPrefix">Hello,</span> <span id="userGreeting"></span></div>
+      <button id="userCenterButton" class="ghost">User Center</button>
+      <button id="logoutButton" class="ghost">Log Out</button>
+      <button id="refreshButton">Refresh Emails</button>
     </div>
   </header>
 
@@ -25,12 +32,12 @@
     <section class="pane mail-list-pane">
       <div class="mail-toolbar">
         <div class="search">
-          <input id="searchInput" type="search" placeholder="搜索主题或发件人...">
+          <input id="searchInput" type="search" placeholder="Search subject or sender...">
         </div>
         <div class="pager">
-          <button id="prevPage" aria-label="上一页">&lt;</button>
-          <span id="pageInfo">第 1 页</span>
-          <button id="nextPage" aria-label="下一页">&gt;</button>
+          <button id="prevPage" aria-label="Previous page">&lt;</button>
+          <span id="pageInfo">Page 1 / 1</span>
+          <button id="nextPage" aria-label="Next page">&gt;</button>
         </div>
       </div>
 
@@ -39,28 +46,28 @@
 
     <section class="pane mail-detail-pane">
       <div id="emailDetail" class="email-detail empty">
-        <div class="placeholder">选择一封邮件查看详情</div>
+        <div class="placeholder">Select an email to view details</div>
       </div>
     </section>
 
     <section class="pane chat-pane">
       <div class="chat-header">
         <div>
-          <div class="chat-title">AI 助手</div>
-          <div class="chat-subtitle">引用邮箱内容并回答你的问题</div>
+          <div class="chat-title" id="chatTitle">AI Assistant</div>
+          <!-- <div class="chat-subtitle" id="chatSubtitle">Cites inbox content and answers your questions</div> -->
         </div>
         <div class="chat-actions">
-          <button id="chatSessionsButton" class="ghost">聊天历史</button>
-          <button id="clearChatButton" class="ghost">清空聊天</button>
-          <button id="newChatButton" class="ghost">新建聊天</button>
+          <button id="chatSessionsButton" class="ghost">Chat History</button>
+          <button id="clearChatButton" class="ghost">Clear Chat</button>
+          <button id="newChatButton" class="ghost">New Chat</button>
         </div>
       </div>
 
       <div id="chatHistory" class="chat-history"></div>
 
       <div class="chat-input">
-        <textarea id="chatInput" rows="3" placeholder="向 AI 提问，右侧会显示回答."></textarea>
-        <button id="sendButton">发送</button>
+        <textarea id="chatInput" rows="3" placeholder="Ask AI, the reply shows on the right."></textarea>
+        <button id="sendButton">Send</button>
       </div>
     </section>
   </main>
@@ -71,10 +78,10 @@
     <div class="modal-content">
       <div class="modal-header">
         <div>
-          <div class="modal-title">聊天历史</div>
-          <div class="modal-subtitle">展示当前用户的会话标题与创建时间</div>
+          <div class="modal-title" id="chatHistoryTitle">Chat History</div>
+          <div class="modal-subtitle" id="chatHistorySubtitle">Show session title and created time for this user</div>
         </div>
-        <button id="closeChatHistoryButton" class="ghost icon-btn" aria-label="关闭聊天历史">×</button>
+        <button id="closeChatHistoryButton" class="ghost icon-btn" aria-label="Close chat history">×</button>
       </div>
       <div id="chatSessionsList" class="modal-body"></div>
     </div>
@@ -84,27 +91,27 @@
     <div class="modal-content wide">
       <div class="modal-header">
         <div>
-          <div class="modal-title">用户中心</div>
-          <div class="modal-subtitle">查看 / 管理已授权邮箱账号，支持 Gmail OAuth 重新授权与同步。</div>
+          <div class="modal-title" id="userCenterTitle">User Center</div>
+          <div class="modal-subtitle" id="userCenterSubtitle">Manage authorized mailboxes, support Gmail OAuth re-auth & sync.</div>
         </div>
-        <button id="closeUserCenterButton" class="ghost icon-btn" aria-label="关闭用户中心">×</button>
+        <button id="closeUserCenterButton" class="ghost icon-btn" aria-label="Close user center">×</button>
       </div>
       <div class="modal-body user-center-body">
         <div class="user-center-section">
           <div class="section-head">
             <div>
-          <div class="section-title">链接 Gmail</div>
+          <div class="section-title" id="linkGmailTitle">Link Gmail</div>
           <!-- <div class="section-desc">使用 OAuth2.0 授权，成功后会自动调用后台 /gmail/connect。</div> -->
         </div>
-        <button id="connectGmailButton">链接 Gmail</button>
+        <button id="connectGmailButton">Link Gmail</button>
       </div>
     </div>
         <div class="user-center-section">
           <div class="section-head">
-            <div class="section-title">已链接邮箱</div>
+            <div class="section-title" id="linkedMailboxesTitle">Linked Mailboxes</div>
             <!-- <div class="section-desc">显示 mailbox_sync_state 中已保存的账号；点击同步会调用 /gmail/sync。</div> -->
           </div>
-          <div id="mailboxesList" class="mailbox-list placeholder">暂无数据</div>
+          <div id="mailboxesList" class="mailbox-list placeholder">No data</div>
         </div>
       </div>
     </div>

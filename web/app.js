@@ -26,11 +26,184 @@
   const gmailClientIdInput = document.getElementById("gmailClientIdInput");
   const gmailRedirectInput = document.getElementById("gmailRedirectInput");
   const mailboxesList = document.getElementById("mailboxesList");
+  const languageSelect = document.getElementById("languageSelect");
+  const languageLabel = document.getElementById("languageLabel");
+  const greetingPrefix = document.getElementById("greetingPrefix");
+  const chatTitleEl = document.getElementById("chatTitle");
+  const chatSubtitleEl = document.getElementById("chatSubtitle");
+  const chatHistoryTitle = document.getElementById("chatHistoryTitle");
+  const chatHistorySubtitle = document.getElementById("chatHistorySubtitle");
+  const userCenterTitle = document.getElementById("userCenterTitle");
+  const userCenterSubtitle = document.getElementById("userCenterSubtitle");
+  const linkGmailTitle = document.getElementById("linkGmailTitle");
+  const linkedMailboxesTitle = document.getElementById("linkedMailboxesTitle");
   let statusTimer = null;
 
   const GMAIL_CLIENT_ID =
     "654999043656-m1nk36prvumftarm2vmuvnqfh685r9kj.apps.googleusercontent.com";
   const GMAIL_REDIRECT_URI = "http://localhost:3000/oauth-callback.html";
+  const I18N_KEY = "uiLanguage";
+  const translations = {
+    en: {
+      languageLabel: "Language",
+      greetingPrefix: "Hello,",
+      userCenterButton: "User Center",
+      logoutButton: "Log Out",
+      refreshButton: "Refresh Emails",
+      prevPageAria: "Previous page",
+      nextPageAria: "Next page",
+      searchPlaceholder: "Search subject or sender...",
+      pageInfo: "Page {page} / {total}",
+      emailDetailPlaceholder: "Select an email to view details",
+      chatTitle: "AI Assistant",
+      chatSubtitle: "Cites inbox content and answers your questions",
+      chatHistoryButton: "Chat History",
+      clearChatButton: "Clear Chat",
+      newChatButton: "New Chat",
+      chatInputPlaceholder: "Ask AI, the reply shows on the right.",
+      sendButton: "Send",
+      chatHistoryTitle: "Chat History",
+      chatHistorySubtitle: "Show session title and created time for this user",
+      closeChatHistoryAria: "Close chat history",
+      userCenterTitle: "User Center",
+      userCenterSubtitle: "Manage authorized mailboxes, support Gmail OAuth re-auth & sync.",
+      closeUserCenterAria: "Close user center",
+      linkGmailTitle: "Link Gmail",
+      linkedMailboxesTitle: "Linked Mailboxes",
+      mailboxesNoData: "No data",
+      promotionTag: "Promo",
+      recipientsLabel: "To:",
+      threadLabel: "Thread:",
+      externalIdLabel: "External ID:",
+      noSubject: "(No subject)",
+      statusSessionExpired: "Session expired, please log in again",
+      statusLoadingEmails: "Loading email list...",
+      statusLoadFailedWithCode: "Load failed: {status} {statusText}",
+      statusEmailsLoaded: "Emails loaded",
+      statusEmailsLoadFailed: "Unable to load emails",
+      statusEmailBodyFailedWithCode: "Failed to load email body: {status}",
+      statusEmailBodyFailed: "Failed to load email body",
+      placeholderLoadingBody: "Loading full email...",
+      chatHistoryEmpty: "No chat history yet",
+      sessionUntitled: "(Untitled conversation)",
+      statusThinking: "AI is thinking...",
+      statusAIRequestFailedWithCode: "AI request failed: {status}",
+      aiEmptyResponse: "(No response)",
+      statusAnswerReady: "Answer generated",
+      statusRequestFailed: "Request failed",
+      placeholderChatHistoryLoading: "Loading chat history...",
+      statusHistoryFailedWithCode: "Failed to load chat history: {status}",
+      statusHistoryLoaded: "Chat history loaded",
+      statusHistoryFailed: "Failed to load chat history",
+      statusLoadingChatMessages: "Loading chat messages...",
+      statusChatMessagesFailedWithCode: "Failed to load chat messages: {status}",
+      statusChatMessagesFailed: "Failed to load chat messages",
+      statusSwitchedSession: "Switched to session {chatId}",
+      statusResetSession: "Switched chat_id: {chatId}",
+      placeholderMailboxesLoading: "Loading mailboxes...",
+      statusMailboxesFailedWithCode: "Load failed {status}",
+      statusMailboxesFailed: "Failed to load mailboxes",
+      placeholderMailboxesEmpty: "No linked mailbox yet",
+      lastSyncedLabel: "Last sync: {time}",
+      neverSynced: "Not synced",
+      createdAtLabel: "Created: {time}",
+      syncButton: "Sync",
+      statusSyncedMailbox: "{email} synced",
+      statusSyncFailedWithCode: "Sync failed ({status})",
+      statusSyncComplete: "Sync completed: added {count} messages",
+      statusSyncNeedsReauth: "Sync failed, try re-authorizing",
+      statusNoGmailToken: "No Gmail access_token received",
+      statusFetchingGmailProfile: "Fetching Gmail account info...",
+      statusGmailProfileFailedWithCode: "Unable to fetch Gmail mailbox ({status})",
+      statusNoMailboxEmail: "Could not get mailbox email",
+      statusGmailMismatch: "Authorized email does not match mailbox to sync",
+      statusGmailAuthFailed: "Gmail authorization failed",
+      statusGmailConnectFailedWithCode: "Gmail connect failed ({status})",
+      statusGmailConnectSuccess: "Gmail linked, fetched {count} emails",
+      statusGmailStateMismatch: "Gmail OAuth state mismatch",
+      statusGmailAuthErrorWithDetail: "Gmail authorization failed: {detail}",
+    },
+    "zh-CN": {
+      languageLabel: "语言",
+      greetingPrefix: "你好，",
+      userCenterButton: "用户中心",
+      logoutButton: "退出登录",
+      refreshButton: "刷新邮件",
+      prevPageAria: "上一页",
+      nextPageAria: "下一页",
+      searchPlaceholder: "搜索主题或发件人...",
+      pageInfo: "第 {page} / {total} 页",
+      emailDetailPlaceholder: "选择一封邮件查看详情",
+      chatTitle: "AI 助手",
+      chatSubtitle: "引用邮箱内容并回答你的问题",
+      chatHistoryButton: "聊天历史",
+      clearChatButton: "清空聊天",
+      newChatButton: "新建聊天",
+      chatInputPlaceholder: "向 AI 提问，右侧会显示回答。",
+      sendButton: "发送",
+      chatHistoryTitle: "聊天历史",
+      chatHistorySubtitle: "展示当前用户的会话标题与创建时间",
+      closeChatHistoryAria: "关闭聊天历史",
+      userCenterTitle: "用户中心",
+      userCenterSubtitle: "查看 / 管理已授权邮箱账号，支持 Gmail OAuth 重新授权与同步。",
+      closeUserCenterAria: "关闭用户中心",
+      linkGmailTitle: "链接 Gmail",
+      linkedMailboxesTitle: "已链接邮箱",
+      mailboxesNoData: "暂无数据",
+      promotionTag: "推广",
+      recipientsLabel: "收件人:",
+      threadLabel: "线程:",
+      externalIdLabel: "外部ID:",
+      noSubject: "(无主题)",
+      statusSessionExpired: "登录已失效，请重新登录",
+      statusLoadingEmails: "正在加载邮件列表...",
+      statusLoadFailedWithCode: "加载失败：{status} {statusText}",
+      statusEmailsLoaded: "邮件加载完成",
+      statusEmailsLoadFailed: "无法加载邮件",
+      statusEmailBodyFailedWithCode: "加载正文失败：{status}",
+      statusEmailBodyFailed: "加载正文失败",
+      placeholderLoadingBody: "正在加载完整正文...",
+      chatHistoryEmpty: "暂无聊天记录",
+      sessionUntitled: "(未命名会话)",
+      statusThinking: "AI 思考中...",
+      statusAIRequestFailedWithCode: "AI 请求失败：{status}",
+      aiEmptyResponse: "（空响应）",
+      statusAnswerReady: "回答已生成",
+      statusRequestFailed: "请求失败",
+      placeholderChatHistoryLoading: "正在加载聊天历史...",
+      statusHistoryFailedWithCode: "加载聊天历史失败：{status}",
+      statusHistoryLoaded: "聊天历史已加载",
+      statusHistoryFailed: "加载聊天历史失败",
+      statusLoadingChatMessages: "正在加载聊天记录...",
+      statusChatMessagesFailedWithCode: "加载聊天记录失败：{status}",
+      statusChatMessagesFailed: "加载聊天记录失败",
+      statusSwitchedSession: "已切换到会话 {chatId}",
+      statusResetSession: "已切换 chat_id: {chatId}",
+      placeholderMailboxesLoading: "正在加载邮箱...",
+      statusMailboxesFailedWithCode: "加载失败 {status}",
+      statusMailboxesFailed: "加载邮箱失败",
+      placeholderMailboxesEmpty: "暂无已链接邮箱",
+      lastSyncedLabel: "最近同步：{time}",
+      neverSynced: "未同步",
+      createdAtLabel: "创建：{time}",
+      syncButton: "同步",
+      statusSyncedMailbox: "{email} 已同步",
+      statusSyncFailedWithCode: "同步失败 ({status})",
+      statusSyncComplete: "同步完成：新增 {count} 封",
+      statusSyncNeedsReauth: "同步失败，尝试重新授权",
+      statusNoGmailToken: "未获取到 Gmail access_token",
+      statusFetchingGmailProfile: "正在获取 Gmail 账户信息...",
+      statusGmailProfileFailedWithCode: "无法获取 Gmail 邮箱 ({status})",
+      statusNoMailboxEmail: "未能获取邮箱账号",
+      statusGmailMismatch: "授权邮箱与待同步邮箱不一致",
+      statusGmailAuthFailed: "Gmail 授权失败",
+      statusGmailConnectFailedWithCode: "Gmail connect 失败 ({status})",
+      statusGmailConnectSuccess: "Gmail 链接成功，已抓取 {count} 封邮件",
+      statusGmailStateMismatch: "Gmail OAuth 状态不匹配",
+      statusGmailAuthErrorWithDetail: "Gmail 授权失败：{detail}",
+    },
+  };
+  let currentLang = loadFromStorage(I18N_KEY) || "en";
 
   const state = {
     page: 1,
@@ -74,6 +247,62 @@
     }
   }
 
+  function t(key, params = {}) {
+    const table = translations[currentLang] || translations.en;
+    const template = table[key] || translations.en[key] || key;
+    return template.replace(/\{(\w+)\}/g, (_, k) => (params[k] !== undefined ? params[k] : ""));
+  }
+
+  function applyLanguage() {
+    document.documentElement.lang = currentLang;
+    if (languageSelect) {
+      languageSelect.value = currentLang;
+    }
+    if (languageLabel) {
+      languageLabel.textContent = t("languageLabel");
+    }
+    if (greetingPrefix) {
+      greetingPrefix.textContent = t("greetingPrefix");
+    }
+    if (userCenterButton) userCenterButton.textContent = t("userCenterButton");
+    if (logoutButton) logoutButton.textContent = t("logoutButton");
+    if (refreshButton) refreshButton.textContent = t("refreshButton");
+    if (searchInput) searchInput.placeholder = t("searchPlaceholder");
+    if (prevPageBtn) prevPageBtn.setAttribute("aria-label", t("prevPageAria"));
+    if (nextPageBtn) nextPageBtn.setAttribute("aria-label", t("nextPageAria"));
+    if (pageInfo) {
+      const totalPages = Math.max(1, Math.ceil(state.total / state.pageSize));
+      pageInfo.textContent = t("pageInfo", { page: state.page, total: totalPages });
+    }
+    if (chatTitleEl) chatTitleEl.textContent = t("chatTitle");
+    if (chatSubtitleEl) chatSubtitleEl.textContent = t("chatSubtitle");
+    if (chatSessionsButton) chatSessionsButton.textContent = t("chatHistoryButton");
+    if (clearChatButton) clearChatButton.textContent = t("clearChatButton");
+    if (newChatButton) newChatButton.textContent = t("newChatButton");
+    if (chatInput) chatInput.placeholder = t("chatInputPlaceholder");
+    if (sendButton) sendButton.textContent = t("sendButton");
+    if (chatHistoryTitle) chatHistoryTitle.textContent = t("chatHistoryTitle");
+    if (chatHistorySubtitle) chatHistorySubtitle.textContent = t("chatHistorySubtitle");
+    if (closeChatHistoryButton)
+      closeChatHistoryButton.setAttribute("aria-label", t("closeChatHistoryAria"));
+    if (userCenterTitle) userCenterTitle.textContent = t("userCenterTitle");
+    if (userCenterSubtitle) userCenterSubtitle.textContent = t("userCenterSubtitle");
+    if (closeUserCenterButton)
+      closeUserCenterButton.setAttribute("aria-label", t("closeUserCenterAria"));
+    if (linkGmailTitle) linkGmailTitle.textContent = t("linkGmailTitle");
+    if (connectGmailButton) connectGmailButton.textContent = t("linkGmailTitle");
+    if (linkedMailboxesTitle) linkedMailboxesTitle.textContent = t("linkedMailboxesTitle");
+    if (mailboxesList && !mailboxesList.children.length) {
+      mailboxesList.textContent = t("mailboxesNoData");
+    }
+    if (chatHistoryModal) {
+      chatHistoryModal.setAttribute("aria-label", t("chatHistoryTitle"));
+    }
+    if (userCenterModal) {
+      userCenterModal.setAttribute("aria-label", t("userCenterTitle"));
+    }
+  }
+
   function clearSession() {
     try {
       localStorage.removeItem("authToken");
@@ -96,7 +325,7 @@
   }
 
   function handleUnauthorized() {
-    setStatus("登录已失效，请重新登录", "error", 1800);
+    setStatus(t("statusSessionExpired"), "error", 1800);
     clearSession();
     setTimeout(() => {
       window.location.href = "login.html";
@@ -147,26 +376,28 @@
     });
     if (res.status === 401) {
       handleUnauthorized();
-      throw new Error("登录已失效，请重新登录");
+      throw new Error(t("statusSessionExpired"));
     }
     return res;
   }
 
   async function fetchEmails() {
-    setStatus("正在加载邮件列表...");
+    setStatus(t("statusLoadingEmails"));
     try {
       const url = `${getApiBase()}/emails?page=${state.page}&page_size=${state.pageSize}`;
       const res = await apiFetch(url);
       if (!res.ok) {
-        throw new Error(`加载失败：${res.status} ${res.statusText}`);
+        throw new Error(
+          t("statusLoadFailedWithCode", { status: res.status, statusText: res.statusText })
+        );
       }
       const data = await res.json();
       state.emails = data.items || [];
       state.total = data.total || 0;
       renderEmails();
-      setStatus("邮件加载完成");
+      setStatus(t("statusEmailsLoaded"));
     } catch (err) {
-      setStatus(err.message || "无法加载邮件", "error");
+      setStatus(err.message || t("statusEmailsLoadFailed"), "error");
     }
   }
 
@@ -190,13 +421,13 @@
       }
       item.innerHTML = `
         <div class="email-row">
-          <div class="subject">${escapeHtml(e.subject || "(无主题)")}</div>
+          <div class="subject">${escapeHtml(e.subject || t("noSubject"))}</div>
           <div class="meta">${formatDate(e.ts)}</div>
         </div>
         <div class="email-row">
           <div class="meta">${escapeHtml(e.sender || "")}</div>
           <div class="meta">
-            ${e.is_promotion ? '<span class="chip">推广</span>' : ""}
+            ${e.is_promotion ? `<span class="chip">${t("promotionTag")}</span>` : ""}
             <span class="chip">Score ${Number(e.importance_score || 0).toFixed(2)}</span>
           </div>
         </div>
@@ -207,7 +438,7 @@
     });
 
     const totalPages = Math.max(1, Math.ceil(state.total / state.pageSize));
-    pageInfo.textContent = `第 ${state.page} / ${totalPages} 页`;
+    pageInfo.textContent = t("pageInfo", { page: state.page, total: totalPages });
     prevPageBtn.disabled = state.page <= 1;
     nextPageBtn.disabled = state.page >= totalPages;
   }
@@ -223,7 +454,7 @@
     try {
       const res = await apiFetch(`${getApiBase()}/emails/${emailId}`);
       if (!res.ok) {
-        throw new Error(`加载正文失败：${res.status}`);
+        throw new Error(t("statusEmailBodyFailedWithCode", { status: res.status }));
       }
       const data = await res.json();
       if (!state.selectedEmail || state.selectedEmail.id !== emailId) return;
@@ -231,33 +462,33 @@
       renderEmails();
       renderEmailDetail(state.selectedEmail);
     } catch (err) {
-      setStatus(err.message || "加载正文失败", "error");
+      setStatus(err.message || t("statusEmailBodyFailed"), "error");
     }
   }
 
   function renderEmailDetail(email) {
     if (!email) {
       emailDetail.classList.add("empty");
-      emailDetail.innerHTML = '<div class="placeholder">选择一封邮件查看详情</div>';
+      emailDetail.innerHTML = `<div class="placeholder">${t("emailDetailPlaceholder")}</div>`;
       return;
     }
     emailDetail.classList.remove("empty");
     const body = email.loading
-      ? "<div class='placeholder'>正在加载完整正文...</div>"
+      ? `<div class='placeholder'>${t("placeholderLoadingBody")}</div>`
       : `<div class="body-full">${escapeHtml(email.body_text || email.body_snippet || "")}</div>`;
     emailDetail.innerHTML = `
-      <h3>${escapeHtml(email.subject || "(无主题)")}</h3>
+      <h3>${escapeHtml(email.subject || t("noSubject"))}</h3>
       <div class="detail-meta">
         <span>${escapeHtml(email.sender || "")}</span>
         <span>${formatDate(email.ts)}</span>
       </div>
       <div class="detail-meta">
-        <span>收件人: ${escapeHtml((email.recipients || []).join(", "))}</span>
+        <span>${t("recipientsLabel")} ${escapeHtml((email.recipients || []).join(", "))}</span>
       </div>
       ${body}
       <div class="detail-meta">
-        <span>Thread: ${escapeHtml(email.thread_id || "-")}</span>
-        <span>外部ID: ${escapeHtml(email.external_id || "-")}</span>
+        <span>${t("threadLabel")} ${escapeHtml(email.thread_id || "-")}</span>
+        <span>${t("externalIdLabel")} ${escapeHtml(email.external_id || "-")}</span>
       </div>
     `;
   }
@@ -289,7 +520,7 @@
   function renderChatSessions() {
     chatSessionsList.innerHTML = "";
     if (!state.chatSessions.length) {
-      chatSessionsList.innerHTML = '<div class="placeholder">暂无聊天记录</div>';
+      chatSessionsList.innerHTML = `<div class="placeholder">${t("chatHistoryEmpty")}</div>`;
       return;
     }
     state.chatSessions.forEach((s) => {
@@ -299,7 +530,7 @@
         item.classList.add("active");
       }
       item.innerHTML = `
-        <div class="session-title">${escapeHtml(s.title || "(未命名会话)")}</div>
+        <div class="session-title">${escapeHtml(s.title || t("sessionUntitled"))}</div>
         <div class="session-meta">
           <span>${escapeHtml(s.chat_id || "")}</span>
           <span>${formatDate(s.created_at)}</span>
@@ -315,7 +546,7 @@
     if (!question) return;
     appendChatMessage("user", question);
     chatInput.value = "";
-    setStatus("AI 思考中...", "info", null);
+    setStatus(t("statusThinking"), "info", null);
     try {
       const res = await apiFetch(`${getApiBase()}/ai/ask`, {
         method: "POST",
@@ -327,14 +558,14 @@
         }),
       });
       if (!res.ok) {
-        throw new Error(`AI 请求失败：${res.status}`);
+        throw new Error(t("statusAIRequestFailedWithCode", { status: res.status }));
       }
       const data = await res.json();
-      appendChatMessage("bot", data.answer || "（空响应）", data.sources || []);
-      setStatus("回答已生成");
+      appendChatMessage("bot", data.answer || t("aiEmptyResponse"), data.sources || []);
+      setStatus(t("statusAnswerReady"));
     } catch (err) {
-      appendChatMessage("bot", err.message || "请求失败");
-      setStatus(err.message || "请求失败", "error");
+      appendChatMessage("bot", err.message || t("statusRequestFailed"));
+      setStatus(err.message || t("statusRequestFailed"), "error");
     }
   }
 
@@ -384,21 +615,21 @@
 
   async function openChatHistoryModal() {
     chatHistoryModal.classList.remove("hidden");
-    chatSessionsList.innerHTML = '<div class="placeholder">正在加载聊天历史...</div>';
+    chatSessionsList.innerHTML = `<div class="placeholder">${t("placeholderChatHistoryLoading")}</div>`;
     try {
       const res = await apiFetch(`${getApiBase()}/ai/chat-sessions?limit=200`);
       if (!res.ok) {
-        throw new Error(`加载聊天历史失败：${res.status}`);
+        throw new Error(t("statusHistoryFailedWithCode", { status: res.status }));
       }
       const data = await res.json();
       state.chatSessions = data.items || [];
       renderChatSessions();
-      setStatus("聊天历史已加载");
+      setStatus(t("statusHistoryLoaded"));
     } catch (err) {
       chatSessionsList.innerHTML = `<div class="placeholder">${escapeHtml(
-        err.message || "加载聊天历史失败"
+        err.message || t("statusHistoryFailed")
       )}</div>`;
-      setStatus(err.message || "加载聊天历史失败", "error");
+      setStatus(err.message || t("statusHistoryFailed"), "error");
     }
   }
 
@@ -410,13 +641,13 @@
     closeChatHistoryModal();
     state.chatId = chatId;
     saveToStorage("chatId", chatId);
-    setStatus("正在加载聊天记录...", "info", null);
+    setStatus(t("statusLoadingChatMessages"), "info", null);
     try {
       const res = await apiFetch(
         `${getApiBase()}/ai/chat-messages?chat_id=${encodeURIComponent(chatId)}&limit=200`
       );
       if (!res.ok) {
-        throw new Error(`加载聊天记录失败：${res.status}`);
+        throw new Error(t("statusChatMessagesFailedWithCode", { status: res.status }));
       }
       const data = await res.json();
       state.chatMessages = (data.items || []).map((m) => ({
@@ -424,9 +655,9 @@
         content: m.content,
       }));
       renderChat();
-      setStatus(`已切换到会话 ${chatId}`);
+      setStatus(t("statusSwitchedSession", { chatId }));
     } catch (err) {
-      setStatus(err.message || "加载聊天记录失败", "error");
+      setStatus(err.message || t("statusChatMessagesFailed"), "error");
     }
   }
 
@@ -435,24 +666,26 @@
     state.chatId = newChatId || `chat-${Date.now()}`;
     saveToStorage("chatId", state.chatId);
     renderChat();
-    setStatus(`已切换 chat_id: ${state.chatId}`);
+    setStatus(t("statusResetSession", { chatId: state.chatId }));
   }
 
   async function fetchMailboxes() {
     if (!mailboxesList) return;
-    mailboxesList.innerHTML = '<div class="placeholder">正在加载邮箱...</div>';
+    mailboxesList.innerHTML = `<div class="placeholder">${t("placeholderMailboxesLoading")}</div>`;
     try {
       const res = await apiFetch(`${getApiBase()}/mailboxes`);
       if (!res.ok) {
         const detail = await res.text();
-        throw new Error(detail || `加载失败 ${res.status}`);
+        throw new Error(detail || t("statusMailboxesFailedWithCode", { status: res.status }));
       }
       const data = await res.json();
       state.mailboxes = data.items || [];
       renderMailboxes();
     } catch (err) {
-      mailboxesList.innerHTML = `<div class="placeholder">${escapeHtml(err.message || "加载邮箱失败")}</div>`;
-      setStatus(err.message || "加载邮箱失败", "error");
+      mailboxesList.innerHTML = `<div class="placeholder">${escapeHtml(
+        err.message || t("statusMailboxesFailed")
+      )}</div>`;
+      setStatus(err.message || t("statusMailboxesFailed"), "error");
     }
   }
 
@@ -461,7 +694,7 @@
     mailboxesList.innerHTML = "";
     if (!state.mailboxes.length) {
       mailboxesList.classList.add("placeholder");
-      mailboxesList.textContent = "暂无已链接邮箱";
+      mailboxesList.textContent = t("placeholderMailboxesEmpty");
       return;
     }
     mailboxesList.classList.remove("placeholder");
@@ -483,10 +716,11 @@
       typeTag.textContent = (m.provider_type || "gmail").toUpperCase();
       meta.appendChild(typeTag);
       const lastSync = document.createElement("span");
-      lastSync.textContent = `最近同步：${formatDate(m.last_synced_at) || "未同步"}`;
+      const lastSyncTime = formatDate(m.last_synced_at) || t("neverSynced");
+      lastSync.textContent = t("lastSyncedLabel", { time: lastSyncTime });
       meta.appendChild(lastSync);
       const createdAt = document.createElement("span");
-      createdAt.textContent = `创建：${formatDate(m.created_at)}`;
+      createdAt.textContent = t("createdAtLabel", { time: formatDate(m.created_at) });
       meta.appendChild(createdAt);
       info.appendChild(title);
       info.appendChild(meta);
@@ -495,7 +729,7 @@
       actions.className = "mailbox-actions";
       const syncBtn = document.createElement("button");
       syncBtn.className = "ghost";
-      syncBtn.textContent = "同步";
+      syncBtn.textContent = t("syncButton");
       syncBtn.onclick = () => syncMailboxWithRetry(m);
       actions.appendChild(syncBtn);
 
@@ -541,41 +775,43 @@
 
   async function handleGmailAccessToken(accessToken, refreshToken = null) {
     if (!accessToken) {
-      setStatus("未获取到 Gmail access_token", "error");
+      setStatus(t("statusNoGmailToken"), "error");
       return;
     }
-    setStatus("正在获取 Gmail 账户信息...", "info");
+    setStatus(t("statusFetchingGmailProfile"), "info");
     try {
       const profileRes = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/profile", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (!profileRes.ok) {
         const detail = await profileRes.text();
-        throw new Error(detail || `无法获取 Gmail 邮箱 (${profileRes.status})`);
+        throw new Error(
+          detail || t("statusGmailProfileFailedWithCode", { status: profileRes.status })
+        );
       }
       const profile = await profileRes.json();
       const email = (profile && profile.emailAddress) || "";
       if (!email) {
-        throw new Error("未能获取邮箱账号");
+        throw new Error(t("statusNoMailboxEmail"));
       }
       const pendingAction = state.pendingGmailAction || { type: "connect" };
       state.pendingGmailAction = null;
       if (pendingAction.type === "sync" && pendingAction.email) {
         const target = (pendingAction.email || "").toLowerCase();
         if (target && target !== email.toLowerCase()) {
-          throw new Error("授权邮箱与待同步邮箱不一致");
+          throw new Error(t("statusGmailMismatch"));
         }
       }
       if (pendingAction.type === "sync") {
         await callGmailSync(email, { access_token: accessToken, refresh_token: refreshToken });
-        setStatus(`${email} 已同步`);
+        setStatus(t("statusSyncedMailbox", { email }));
       } else {
         await callGmailConnect(email, accessToken, refreshToken);
       }
       await fetchMailboxes();
       await fetchEmails();
     } catch (err) {
-      setStatus(err.message || "Gmail 授权失败", "error");
+      setStatus(err.message || t("statusGmailAuthFailed"), "error");
     }
   }
 
@@ -592,10 +828,10 @@
     });
     if (!res.ok) {
       const detail = await res.text();
-      throw new Error(detail || `Gmail connect 失败 (${res.status})`);
+      throw new Error(detail || t("statusGmailConnectFailedWithCode", { status: res.status }));
     }
     const data = await res.json();
-    setStatus(`Gmail 链接成功，已抓取 ${data.ingested || 0} 封邮件`, "info");
+    setStatus(t("statusGmailConnectSuccess", { count: data.ingested || 0 }), "info");
     return data;
   }
 
@@ -617,12 +853,12 @@
     });
     if (!res.ok) {
       const detail = await res.text();
-      const err = new Error(detail || `同步失败 (${res.status})`);
+      const err = new Error(detail || t("statusSyncFailedWithCode", { status: res.status }));
       err.status = res.status;
       throw err;
     }
     const data = await res.json();
-    setStatus(`同步完成：新增 ${data.ingested || 0} 封`, "info");
+    setStatus(t("statusSyncComplete", { count: data.ingested || 0 }), "info");
     return data;
   }
 
@@ -632,9 +868,9 @@
       await callGmailSync(email);
       await fetchMailboxes();
       await fetchEmails();
-      setStatus(`${email} 已同步`);
+      setStatus(t("statusSyncedMailbox", { email }));
     } catch (err) {
-      setStatus((err && err.message) || "同步失败，尝试重新授权", "error");
+      setStatus((err && err.message) || t("statusSyncNeedsReauth"), "error");
       state.pendingGmailAction = { type: "sync", email };
       startGmailOAuth({ type: "sync", email });
     }
@@ -644,12 +880,15 @@
     const data = event.data || {};
     if (data.source !== "gmail-oauth") return;
     if (state.pendingGmailState && data.state && data.state !== state.pendingGmailState) {
-      setStatus("Gmail OAuth 状态不匹配", "error");
+      setStatus(t("statusGmailStateMismatch"), "error");
       return;
     }
     state.pendingGmailState = null;
     if (data.error) {
-      setStatus(`Gmail 授权失败：${data.error_description || data.error}`, "error");
+      setStatus(
+        t("statusGmailAuthErrorWithDetail", { detail: data.error_description || data.error }),
+        "error"
+      );
       return;
     }
     handleGmailAccessToken(data.access_token, data.refresh_token);
@@ -710,10 +949,23 @@
       clearSession();
       window.location.href = "login.html";
     };
+    if (languageSelect) {
+      languageSelect.onchange = (e) => {
+        currentLang = e.target.value || "en";
+        saveToStorage(I18N_KEY, currentLang);
+        applyLanguage();
+        renderEmails();
+        renderEmailDetail(state.selectedEmail);
+        renderChat();
+        renderChatSessions();
+        renderMailboxes();
+      };
+    }
   }
 
   function init() {
     if (!requireAuth()) return;
+    applyLanguage();
     bindEvents();
     window.addEventListener("message", handleWindowMessage);
     renderEmails();

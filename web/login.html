@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>登录 - Email AI Agent</title>
+  <title>Login - Email AI Agent</title>
   <link rel="stylesheet" href="./style.css">
 </head>
 <body class="auth-body">
@@ -11,7 +11,7 @@
     <div class="auth-card">
       <div class="auth-header">
         <div class="logo">📧 Email AI Agent</div>
-        <div class="auth-subtitle">登录后访问邮箱智能助手</div>
+        <div class="auth-subtitle" id="loginSubtitle">Access the inbox AI assistant after login</div>
       </div>
       <form id="loginForm" class="auth-form">
         <label class="inline-label full-width">
@@ -19,14 +19,21 @@
           <input id="apiBaseInput" type="text" value="http://localhost:8000" spellcheck="false" required>
         </label>
         <label class="inline-label full-width">
+          <span id="loginLanguageLabel">Language</span>
+          <select id="languageSelect">
+            <option value="en">English</option>
+            <option value="zh-CN">中文</option>
+          </select>
+        </label>
+        <label class="inline-label full-width">
           User ID
-          <input id="userIdInput" type="text" placeholder="请输入用户 ID" required>
+          <input id="userIdInput" type="text" placeholder="Enter user ID" required>
         </label>
         <label class="inline-label full-width">
           Password
-          <input id="passwordInput" type="password" placeholder="请输入密码" required>
+          <input id="passwordInput" type="password" placeholder="Enter password" required>
         </label>
-        <button type="submit">登录 / 注册</button>
+        <button type="submit" id="loginSubmitButton">Login / Register</button>
       </form>
       <div id="statusBar" class="status-bar"></div>
     </div>

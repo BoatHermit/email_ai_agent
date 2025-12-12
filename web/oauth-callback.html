@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Gmail OAuth Callback</title>
@@ -7,6 +7,30 @@
 <body>
   <script>
     (() => {
+      const messages = {
+        en: {
+          success: "Authorization completed, you can close this window.",
+          failed: "No authorization info received, please go back and try again.",
+        },
+        "zh-CN": {
+          success: "授权完成，可以关闭此窗口。",
+          failed: "未获取到授权信息，请返回重试。",
+        },
+      };
+
+      function getLang() {
+        try {
+          const saved = localStorage.getItem("uiLanguage");
+          if (saved && messages[saved]) return saved;
+        } catch (_) {
+          /* ignore */
+        }
+        return "en";
+      }
+
+      const lang = getLang();
+      document.documentElement.lang = lang;
+
       function parseHash() {
         const hash = window.location.hash.replace(/^#/, "");
         const params = {};
@@ -28,8 +52,8 @@
         /* ignore */
       }
       document.body.innerHTML = data.access_token
-        ? "<p>授权完成，可以关闭此窗口。</p>"
-        : "<p>未获取到授权信息，请返回重试。</p>";
+        ? `<p>${messages[lang].success}</p>`
+        : `<p>${messages[lang].failed}</p>`;
       setTimeout(() => {
         window.close();
       }, 1200);
