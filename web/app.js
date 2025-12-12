@@ -1,6 +1,7 @@
 (() => {
   const apiBaseInput = document.getElementById("apiBaseInput");
-  const userIdInput = document.getElementById("userIdInput");
+  const userGreeting = document.getElementById("userGreeting");
+  const logoutButton = document.getElementById("logoutButton");
   const searchInput = document.getElementById("searchInput");
   const emailList = document.getElementById("emailList");
   const emailDetail = document.getElementById("emailDetail");
@@ -29,10 +30,11 @@
     chatMessages: [],
     chatId: loadFromStorage("chatId") || `chat-${Date.now()}`,
     chatSessions: [],
+    userId: loadFromStorage("userId"),
+    authToken: loadFromStorage("authToken"),
   };
 
   apiBaseInput.value = loadFromStorage("apiBase") || apiBaseInput.value;
-  userIdInput.value = loadFromStorage("userId") || userIdInput.value;
 
   function saveToStorage(key, value) {
     try {
@@ -50,12 +52,44 @@
     }
   }
 
+  function clearSession() {
+    try {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("chatId");
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function requireAuth() {
+    if (!state.userId || !state.authToken) {
+      window.location.href = "login.html";
+      return false;
+    }
+    if (userGreeting) {
+      userGreeting.textContent = state.userId;
+    }
+    return true;
+  }
+
+  function handleUnauthorized() {
+    setStatus("登录已失效，请重新登录", "error", 1800);
+    clearSession();
+    setTimeout(() => {
+      window.location.href = "login.html";
+    }, 600);
+  }
+
   function getApiBase() {
     return apiBaseInput.value.replace(/\/+$/, "");
   }
 
-  function getUserId() {
-    return userIdInput.value.trim() || "demo";
+  function authHeaders(extra = {}) {
+    return {
+      Authorization: `Bearer ${state.authToken || ""}`,
+      ...extra,
+    };
   }
 
   function setStatus(message, type = "info", duration = 3000) {
@@ -80,15 +114,23 @@
     return d.toLocaleString();
   }
 
+  async function apiFetch(url, options = {}) {
+    const res = await fetch(url, {
+      ...options,
+      headers: authHeaders(options.headers || {}),
+    });
+    if (res.status === 401) {
+      handleUnauthorized();
+      throw new Error("登录已失效，请重新登录");
+    }
+    return res;
+  }
+
   async function fetchEmails() {
     setStatus("正在加载邮件列表...");
     try {
       const url = `${getApiBase()}/emails?page=${state.page}&page_size=${state.pageSize}`;
-      const res = await fetch(url, {
-        headers: {
-          "X-User-Id": getUserId(),
-        },
-      });
+      const res = await apiFetch(url);
       if (!res.ok) {
         throw new Error(`加载失败：${res.status} ${res.statusText}`);
       }
@@ -153,14 +195,11 @@
 
   async function fetchEmailDetail(emailId) {
     try {
-      const res = await fetch(`${getApiBase()}/emails/${emailId}`, {
-        headers: { "X-User-Id": getUserId() },
-      });
+      const res = await apiFetch(`${getApiBase()}/emails/${emailId}`);
       if (!res.ok) {
         throw new Error(`加载正文失败：${res.status}`);
       }
       const data = await res.json();
-      // Ensure we're updating the currently selected email
       if (!state.selectedEmail || state.selectedEmail.id !== emailId) return;
       state.selectedEmail = { ...data, loading: false };
       renderEmails();
@@ -252,12 +291,9 @@
     chatInput.value = "";
     setStatus("AI 思考中...", "info", null);
     try {
-      const res = await fetch(`${getApiBase()}/ai/ask`, {
+      const res = await apiFetch(`${getApiBase()}/ai/ask`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-User-Id": getUserId(),
-        },
+        headers: authHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({
           question,
           current_thread_id: state.selectedEmail ? state.selectedEmail.thread_id : null,
@@ -282,22 +318,17 @@
   }
 
   function renderMarkdown(text) {
-    // Escape HTML first to avoid injection
     let escaped = escapeHtml(text || "");
-
-    // Headings (simple)
     escaped = escaped
       .replace(/^###\s+(.+)$/gm, "<h4>$1</h4>")
       .replace(/^##\s+(.+)$/gm, "<h3>$1</h3>")
       .replace(/^#\s+(.+)$/gm, "<h2>$1</h2>");
 
-    // Inline styles
     escaped = escaped
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
       .replace(/\*(.+?)\*/g, "<em>$1</em>")
       .replace(/`([^`]+)`/g, "<code>$1</code>");
 
-    // Lists
     const lines = escaped.split(/\r?\n/);
     let inList = false;
     const htmlLines = [];
@@ -329,11 +360,7 @@
     chatHistoryModal.classList.remove("hidden");
     chatSessionsList.innerHTML = '<div class="placeholder">正在加载聊天历史...</div>';
     try {
-      const res = await fetch(`${getApiBase()}/ai/chat-sessions?limit=200`, {
-        headers: {
-          "X-User-Id": getUserId(),
-        },
-      });
+      const res = await apiFetch(`${getApiBase()}/ai/chat-sessions?limit=200`);
       if (!res.ok) {
         throw new Error(`加载聊天历史失败：${res.status}`);
       }
@@ -359,11 +386,8 @@
     saveToStorage("chatId", chatId);
     setStatus("正在加载聊天记录...", "info", null);
     try {
-      const res = await fetch(
-        `${getApiBase()}/ai/chat-messages?chat_id=${encodeURIComponent(chatId)}&limit=200`,
-        {
-          headers: { "X-User-Id": getUserId() },
-        }
+      const res = await apiFetch(
+        `${getApiBase()}/ai/chat-messages?chat_id=${encodeURIComponent(chatId)}&limit=200`
       );
       if (!res.ok) {
         throw new Error(`加载聊天记录失败：${res.status}`);
@@ -423,10 +447,14 @@
       }
     });
     apiBaseInput.onchange = () => saveToStorage("apiBase", getApiBase());
-    userIdInput.onchange = () => saveToStorage("userId", getUserId());
+    logoutButton.onclick = () => {
+      clearSession();
+      window.location.href = "login.html";
+    };
   }
 
   function init() {
+    if (!requireAuth()) return;
     bindEvents();
     renderEmails();
     renderChat();

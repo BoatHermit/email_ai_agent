@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 - Email AI Agent</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body class="auth-body">
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo">📧 Email AI Agent</div>
+        <div class="auth-subtitle">登录后访问邮箱智能助手</div>
+      </div>
+      <form id="loginForm" class="auth-form">
+        <label class="inline-label full-width">
+          API Base
+          <input id="apiBaseInput" type="text" value="http://localhost:8000" spellcheck="false" required>
+        </label>
+        <label class="inline-label full-width">
+          User ID
+          <input id="userIdInput" type="text" placeholder="请输入用户 ID" required>
+        </label>
+        <label class="inline-label full-width">
+          Password
+          <input id="passwordInput" type="password" placeholder="请输入密码" required>
+        </label>
+        <button type="submit">登录 / 注册</button>
+      </form>
+      <div id="statusBar" class="status-bar"></div>
+    </div>
+  </div>
+  <script src="./login.js"></script>
+</body>
+</html>

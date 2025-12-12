@@ -1,11 +1,16 @@
-from fastapi import Header, HTTPException, status
+from fastapi import Depends, Header, HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.api.dependencies import get_db
+from app.services.auth import verify_token
 
 
-def get_current_user_id(x_user_id: str = Header(None)) -> str:
-    """
-    简易示例：从请求头 X-User-Id 解析当前用户。
-    在生产中应替换为 JWT/Session 验证，并在此处返回 user/tenant 信息。
-    """
-    if not x_user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing X-User-Id header")
-    return x_user_id
+def get_current_user_id(
+    authorization: str = Header(None), db: Session = Depends(get_db)
+) -> str:
+    if not authorization or not authorization.lower().startswith("bearer "):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing token")
+    token = authorization.split(" ", 1)[1].strip()
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing token")
+    return verify_token(db, token)

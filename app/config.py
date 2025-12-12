@@ -12,6 +12,8 @@ class Settings:
     OPENAI_BASE_URL: str = os.getenv("OPENAI_BASE_URL", "")
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./email_ai.db")
     ENABLE_CROSS_ENCODER: bool = os.getenv("ENABLE_CROSS_ENCODER", "false").lower() == "true"
+    AUTH_SECRET: str = os.getenv("AUTH_SECRET", "change-me")
+    AUTH_TOKEN_TTL_SECONDS: int = int(os.getenv("AUTH_TOKEN_TTL_SECONDS", str(60 * 60 * 24 * 30)))
     # Elasticsearch
     ELASTICSEARCH_URL: str = os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")
     ELASTICSEARCH_INDEX_EMAILS: str = os.getenv("ELASTICSEARCH_INDEX_EMAILS", "emails_ai")

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import ai, emails, gmail, ingestion, outlook
+from app.api import ai, auth, emails, gmail, ingestion, outlook
 from app.db import models
 from app.db.base import Base
 from app.db.session import engine
@@ -26,6 +26,7 @@ app.include_router(emails.router)
 app.include_router(ai.router)
 app.include_router(outlook.router)
 app.include_router(gmail.router)
+app.include_router(auth.router)
 
 
 @app.on_event("startup")

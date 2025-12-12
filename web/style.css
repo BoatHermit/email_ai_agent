@@ -86,6 +86,23 @@ body {
   min-width: 180px;
 }
 
+.inline-label.full-width {
+  width: 100%;
+}
+
+.inline-label.full-width input {
+  width: 100%;
+}
+
+.user-greeting {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  color: var(--text);
+}
+
 button {
   background: var(--accent);
   color: #0b1727;
@@ -373,6 +390,53 @@ button.ghost {
 .status-bar.error {
   border-color: var(--danger);
   color: #fecdd3;
+}
+
+.auth-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.auth-wrapper {
+  width: 100%;
+  max-width: 460px;
+  padding: 20px;
+}
+
+.auth-card {
+  background: rgba(17, 24, 39, 0.82);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 22px 20px 18px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.28);
+}
+
+.auth-header {
+  margin-bottom: 12px;
+}
+
+.auth-subtitle {
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.auth-form {
+  display: grid;
+  gap: 12px;
+}
+
+.auth-form button {
+  width: 100%;
+}
+
+.auth-card .status-bar {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  margin-top: 10px;
+  width: 100%;
 }
 
 .placeholder {
