@@ -7,23 +7,33 @@ from openai import OpenAI
 from app.config import settings
 
 
-# 创建 httpx 客户端（不直接传 proxies 参数，避免某些旧版本 httpx 不兼容）
-_http_client = httpx.Client(
-    timeout=30.0,  # 可以按需调大或调小
-    verify=False,  # 有些代理会做 TLS 拦截，关闭 verify 可避免证书错误（生产环境按需调整）
-)
+# 创建 httpx 客户端
+client_kwargs = {
+    "timeout": 30.0,
+    "verify": False,
+    "proxy": "http://127.0.0.1:7890",
+}
+if settings.OPENAI_PROXY:
+    client_kwargs["proxy"] = settings.OPENAI_PROXY
 
-_client = OpenAI(
-    api_key=settings.OPENAI_API_KEY,
-    base_url=settings.OPENAI_BASE_URL,
-    # http_client=_http_client,
-)
+_http_client = httpx.Client(**client_kwargs)
+
+openai_kwargs = {
+    "api_key": settings.OPENAI_API_KEY,
+    "http_client": _http_client,
+}
+
+if settings.OPENAI_BASE_URL:
+    openai_kwargs["base_url"] = settings.OPENAI_BASE_URL
+
+_client = OpenAI(**openai_kwargs)
 
 
 def chat_completion(
         system_prompt: str,
         user_prompt: str,
         tools: Optional[List[Dict[str, Any]]] = None,
+        **kwargs,
 ) -> Dict[str, Any]:
     """
     封装一次 Chat Completion 调用。
@@ -39,18 +49,22 @@ def chat_completion(
     params = {
         "model": settings.OPENAI_MODEL_GPT,
         "messages": messages,
-        "temperature": 0.1,
     }
 
     if tools:
         params["tools"] = tools
         params["tool_choice"] = "auto"
+    
+    # Allow overriding/adding params (e.g. response_format)
+    params.update(kwargs)
 
     try:
         resp = _client.chat.completions.create(**params)
     except Exception as e:
         # 这里可以按需打印日志 / 上报监控
-        print("⚠️ OpenAI chat_completion error:", repr(e))
+        print(f"⚠️ OpenAI chat_completion error: {type(e).__name__}: {e}")
+        if hasattr(e, '__cause__') and e.__cause__:
+            print(f"   Caused by: {type(e.__cause__).__name__}: {e.__cause__}")
         raise
 
     # 返回统一结构：message dict
