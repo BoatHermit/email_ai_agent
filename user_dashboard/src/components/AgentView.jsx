@@ -6,6 +6,8 @@ import {
   BookOpen, ChevronDown, ChevronUp
 } from 'lucide-react';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // Constants
 const GMAIL_CLIENT_ID = "654999043656-m1nk36prvumftarm2vmuvnqfh685r9kj.apps.googleusercontent.com";
@@ -14,6 +16,7 @@ const GMAIL_REDIRECT_URI = "http://localhost:3001/oauth-callback.html";
 // Sub-component for individual chat messages
 const ChatMessage = ({ msg, theme }) => {
   const [showSources, setShowSources] = useState(false);
+  const content = msg.content || '';
 
   return (
     <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -23,8 +26,18 @@ const ChatMessage = ({ msg, theme }) => {
           : `${theme.cardBg} border ${theme.border} rounded-bl-none ${theme.text}`
         }
       `}>
-         <div className="px-4 py-2 text-sm whitespace-pre-wrap">
-            {msg.content}
+         <div className={`px-4 py-2 text-sm prose prose-sm max-w-none ${msg.role === 'user' ? 'prose-invert' : ''} prose-headings:mt-3 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1`}>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                p: ({ node, ...props }) => <p {...props} className="leading-relaxed" />,
+                ul: ({ node, ...props }) => <ul {...props} className="list-disc pl-5 space-y-1" />,
+                ol: ({ node, ...props }) => <ol {...props} className="list-decimal pl-5 space-y-1" />,
+                li: ({ node, ...props }) => <li {...props} className="leading-relaxed" />
+              }}
+            >
+              {content}
+            </ReactMarkdown>
          </div>
          
          {msg.sources && msg.sources.length > 0 && (
