@@ -1,0 +1,805 @@
+[
+  {
+    "user_id": "user_001",
+    "external_id": "msg_001",
+    "thread_id": "thread_iu_001",
+    "subject": "URGENT: Production API outage – customer impact",
+    "sender": "pager@company.com",
+    "recipients": "bob@example.com, oncall@company.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Hi Bob,\n\nWe detected elevated 5xx errors on the public API since 08:42.\nPlease join the incident bridge ASAP and post an initial update in #incidents.\n\nIncident link: https://status.internal/inc-384\n\nThanks,\nOn-call Bot",
+    "raw_headers": {
+      "Message-ID": "<b0dc84f9-7c7f-4d29-8d55-8a60a10b1e3d@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,WORK,ALERT,QUAD_IU",
+    "ts": "2025-12-13T09:05:00",
+    "importance_score": 0.95,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_002",
+    "thread_id": "thread_iu_002",
+    "subject": "Action Required Today: Cloud invoice overdue",
+    "sender": "billing@cloudhost.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Hello,\n\nYour November invoice is past due. To avoid service suspension, please pay by 5:00 PM today.\n\nInvoice: INV-88421\nAmount: $248.19\n\nRegards,\nCloudHost Billing",
+    "raw_headers": {
+      "Message-ID": "<a082d42e-5f88-4e03-a9c7-224c6d50370c@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,FINANCE,QUAD_IU",
+    "ts": "2025-12-13T09:40:00",
+    "importance_score": 0.9,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_003",
+    "thread_id": "thread_iu_003",
+    "subject": "Security Alert: Suspicious sign-in blocked",
+    "sender": "no-reply@security.microsoft.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "We blocked a suspicious sign-in attempt to your account.\n\nLocation: Unknown\nTime: 2025-12-13 08:57\n\nIf this was you, review your recent activity. If not, change your password immediately.",
+    "raw_headers": {
+      "Message-ID": "<d7bd2aa4-f6ad-43a2-9d5f-7c2d7f8bdf8a@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,SECURITY,ALERT,QUAD_IU",
+    "ts": "2025-12-13T10:10:00",
+    "importance_score": 0.92,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_004",
+    "thread_id": "thread_iu_004",
+    "subject": "Client escalation: data mismatch – need fix by EOD",
+    "sender": "maria@bigclient.com",
+    "recipients": "bob@example.com",
+    "cc": "pm@company.com",
+    "bcc": null,
+    "body_text": "Hi Bob,\n\nWe found a mismatch in yesterday’s reconciliation report.\nCan you investigate and send a corrected file by end of day?\n\nThis is blocking our finance close.\n\nThanks,\nMaria",
+    "raw_headers": {
+      "Message-ID": "<a58bfeaf-6e5c-40d8-8c8a-3f17f0b9b10d@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,WORK,CLIENT,QUAD_IU",
+    "ts": "2025-12-12T16:20:00",
+    "importance_score": 0.88,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_005",
+    "thread_id": "thread_iu_005",
+    "subject": "Exam venue changed (tomorrow) – please read",
+    "sender": "registrar@university.edu",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Dear student,\n\nDue to a room issue, tomorrow’s exam venue has changed.\nNew location: Rm 501, Science Building\nCheck-in: 09:15\n\nPlease arrive early.\n\nRegistrar Office",
+    "raw_headers": {
+      "Message-ID": "<6b73c345-c3df-4588-8d09-07c1b6d1a5db@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,SCHOOL,QUAD_IU",
+    "ts": "2025-12-11T18:30:00",
+    "importance_score": 0.8,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_006",
+    "thread_id": "thread_iu_006",
+    "subject": "Flight change: your itinerary was updated (confirmation needed)",
+    "sender": "noreply@airline.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Your flight has been changed and requires confirmation within 24 hours.\n\nNew departure: 2025-12-14 07:05\nNew arrival: 2025-12-14 10:20\n\nPlease confirm to keep your seat.",
+    "raw_headers": {
+      "Message-ID": "<3a625825-6b0c-4b09-a8b9-0a1e4b0a2c12@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,TRAVEL,QUAD_IU",
+    "ts": "2025-12-10T07:55:00",
+    "importance_score": 0.86,
+    "is_promotion": 0
+  },
+
+  {
+    "user_id": "user_001",
+    "external_id": "msg_007",
+    "thread_id": "thread_in_001",
+    "subject": "Q1 OKR Planning – input requested by next Friday",
+    "sender": "linda@company.com",
+    "recipients": "bob@example.com, team@company.com",
+    "cc": "team@company.com",
+    "bcc": null,
+    "body_text": "Hi Bob,\n\nWe’re finalizing Q1 OKRs. Please add your proposed objectives and key results by next Friday.\nTemplate: shared drive /OKR/Q1\n\nThanks,\nLinda",
+    "raw_headers": {
+      "Message-ID": "<1df5c2a4-6b6b-4f6f-8c2d-7dfe3f3ad9fd@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,WORK,PLANNING,QUAD_IN",
+    "ts": "2025-12-09T11:15:00",
+    "importance_score": 0.78,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_008",
+    "thread_id": "thread_in_002",
+    "subject": "Performance review: self-evaluation form (due next week)",
+    "sender": "hr@company.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Hello,\n\nYour self-evaluation form is now available.\nPlease complete it by 2025-12-20.\n\nHR Team",
+    "raw_headers": {
+      "Message-ID": "<4b0f5528-6fb7-4d7a-8e10-1c6c69b6b2f1@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,WORK,HR,QUAD_IN",
+    "ts": "2025-12-08T09:05:00",
+    "importance_score": 0.75,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_009",
+    "thread_id": "thread_in_003",
+    "subject": "Draft roadmap v2 for review (no rush)",
+    "sender": "pm@company.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Hi Bob,\n\nI shared Roadmap v2 for Q1–Q2. When you have time, could you review sections 2–3 and leave comments?\n\nThanks,\nPM",
+    "raw_headers": {
+      "Message-ID": "<d1c46589-e9a2-4c2b-8c3d-0f2d6a8a5d58@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,WORK,PROJECT,QUAD_IN",
+    "ts": "2025-12-07T14:10:00",
+    "importance_score": 0.7,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_010",
+    "thread_id": "thread_in_004",
+    "subject": "Tax document available in your portal",
+    "sender": "no-reply@bank.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Your annual tax document is now available.\nLog in to view or download it from the Documents section.\n\nThis is an automated message.",
+    "raw_headers": {
+      "Message-ID": "<7c3d7c50-1c46-4b7d-bda9-06f7c6b1c402@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,FINANCE,BANK,QUAD_IN",
+    "ts": "2025-12-06T08:20:00",
+    "importance_score": 0.68,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_011",
+    "thread_id": "thread_in_005",
+    "subject": "Appointment scheduled: annual checkup (next month)",
+    "sender": "clinic@healthcare.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Hi Bob,\n\nThis is a confirmation for your annual checkup.\nDate: 2026-01-10 10:00\nLocation: Downtown Clinic\n\nReply to reschedule.\n\nThanks,\nClinic",
+    "raw_headers": {
+      "Message-ID": "<9bd5b2a4-2c88-4c2a-8f1b-9c6d8e29b4d3@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,HEALTH,QUAD_IN",
+    "ts": "2025-12-05T12:45:00",
+    "importance_score": 0.65,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_012",
+    "thread_id": "thread_in_006",
+    "subject": "Feedback on your proposal draft",
+    "sender": "advisor@lab.edu",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Hi Bob,\n\nI read your proposal draft. Overall direction is strong.\nWhen you have time, please strengthen the evaluation plan section (metrics + baselines).\n\nBest,\nAdvisor",
+    "raw_headers": {
+      "Message-ID": "<f8f84f6b-9bb4-4d93-9b9e-1a0e2cc4d9e7@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,SCHOOL,RESEARCH,QUAD_IN",
+    "ts": "2025-12-04T20:05:00",
+    "importance_score": 0.74,
+    "is_promotion": 0
+  },
+
+  {
+    "user_id": "user_001",
+    "external_id": "msg_013",
+    "thread_id": "thread_nu_001",
+    "subject": "Quick: lunch order closing in 30 minutes",
+    "sender": "cafe@office.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Hi,\n\nToday’s lunch pre-order closes at 11:00 AM.\nOrder here if you want in: https://lunch.office/orders\n\n— Office Cafe",
+    "raw_headers": {
+      "Message-ID": "<6ed8c3e7-3c63-4e09-9c75-0d1e6b1b8a3b@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,OFFICE,QUAD_NU",
+    "ts": "2025-12-13T10:25:00",
+    "importance_score": 0.25,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_014",
+    "thread_id": "thread_nu_002",
+    "subject": "Building notice: water shutdown in 1 hour",
+    "sender": "facilities@building.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Attention,\n\nWater will be shut off from 12:00–14:00 today for maintenance.\nPlease fill any bottles beforehand.\n\nFacilities",
+    "raw_headers": {
+      "Message-ID": "<2c1fdf32-9d47-4f5b-9d5e-6d6a3e2e31b0@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,PERSONAL,NOTICE,QUAD_NU",
+    "ts": "2025-12-13T10:50:00",
+    "importance_score": 0.22,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_015",
+    "thread_id": "thread_nu_003",
+    "subject": "Delivery attempt today – reschedule now",
+    "sender": "no-reply@ups.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "We attempted delivery and will try again today.\nTo choose a time window or pickup point, update your preferences before 2:00 PM.\n\nTracking: 1Z88X...\nUPS",
+    "raw_headers": {
+      "Message-ID": "<d9c2b8f8-6a7e-4a1a-9dfe-9dd8b2f8c1a2@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,SHOPPING,QUAD_NU",
+    "ts": "2025-12-12T09:30:00",
+    "importance_score": 0.2,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_016",
+    "thread_id": "thread_nu_004",
+    "subject": "RSVP needed: team coffee chat today 4pm",
+    "sender": "amy@company.com",
+    "recipients": "bob@example.com, ai-team@company.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Hey Bob,\n\nWe’re doing a quick coffee chat today at 4pm.\nCan you RSVP (yes/no) by 2pm so we can book seats?\n\nAmy",
+    "raw_headers": {
+      "Message-ID": "<54c2a2d6-9c52-4a30-9a36-3b4c5e1a8a8e@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,WORK,SOCIAL,QUAD_NU",
+    "ts": "2025-12-11T10:00:00",
+    "importance_score": 0.3,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_017",
+    "thread_id": "thread_nu_005",
+    "subject": "Reminder: satisfaction survey closes tonight",
+    "sender": "survey@vendor.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Your feedback matters!\nPlease complete the 2-minute survey by tonight.\n\nThanks,\nVendor Team",
+    "raw_headers": {
+      "Message-ID": "<9b5fe3e4-2f0a-4d0a-8a9b-2c6b4a7f2e39@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,UPDATES,QUAD_NU",
+    "ts": "2025-12-10T18:10:00",
+    "importance_score": 0.15,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_018",
+    "thread_id": "thread_nu_006",
+    "subject": "Package pickup window ends today",
+    "sender": "mailroom@apartment.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Hi,\n\nYou have a package at the mailroom. Please pick it up by 7pm today.\n\nMailroom",
+    "raw_headers": {
+      "Message-ID": "<f0a6e4c1-2f6d-4f44-9f19-7d9db6ed3d5d@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,PERSONAL,QUAD_NU",
+    "ts": "2025-12-09T15:35:00",
+    "importance_score": 0.18,
+    "is_promotion": 0
+  },
+
+  {
+    "user_id": "user_001",
+    "external_id": "msg_019",
+    "thread_id": "thread_nn_001",
+    "subject": "Weekly Newsletter: TechDaily Top Stories",
+    "sender": "news@techdaily.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Here are the top stories for this week...\n\n- AI\n- Gadgets\n- Startups\n\nRead more inside.",
+    "raw_headers": {
+      "Message-ID": "<b4f4c9f0-7e2f-4a65-8dd0-0f8f6c2d34b4@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,UPDATES,NEWSLETTER,QUAD_NN",
+    "ts": "2025-12-13T07:30:00",
+    "importance_score": 0.1,
+    "is_promotion": 1
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_020",
+    "thread_id": "thread_nn_002",
+    "subject": "50% off annual plan – limited-time offer",
+    "sender": "promo@streamservice.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Save 50% when you switch to an annual plan.\nOffer ends soon. Terms apply.\n\nUpgrade now.",
+    "raw_headers": {
+      "Message-ID": "<2f9a3d12-7f8a-4d6d-9c92-43c6b8e2d4fb@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,PROMOTION,QUAD_NN",
+    "ts": "2025-12-12T13:05:00",
+    "importance_score": 0.05,
+    "is_promotion": 1
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_021",
+    "thread_id": "thread_nn_003",
+    "subject": "Community digest: new posts you might like",
+    "sender": "no-reply@forum.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Your weekly digest is ready.\nSee what’s trending in your communities.\n\n— Forum",
+    "raw_headers": {
+      "Message-ID": "<f8c2e7de-8b0d-4ab6-9c7f-4fef0d8c1e1f@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,UPDATES,DIGEST,QUAD_NN",
+    "ts": "2025-12-11T06:50:00",
+    "importance_score": 0.08,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_022",
+    "thread_id": "thread_nn_004",
+    "subject": "Your friend tagged you in a photo",
+    "sender": "notify@socialapp.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Someone tagged you in a photo.\nOpen the app to view and manage your tags.",
+    "raw_headers": {
+      "Message-ID": "<b4d8a7c3-6e9e-4c41-8e07-2e9e7a3b3b1a@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,SOCIAL,QUAD_NN",
+    "ts": "2025-12-10T21:15:00",
+    "importance_score": 0.12,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_023",
+    "thread_id": "thread_nn_005",
+    "subject": "Product update: new features released",
+    "sender": "updates@saas.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "We shipped new features this month:\n- Faster search\n- Improved dashboards\n\nLearn more in the release notes.",
+    "raw_headers": {
+      "Message-ID": "<8e6d2c2f-9f0c-45b9-9d2a-7e9b0c2b6d01@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,UPDATES,PRODUCT,QUAD_NN",
+    "ts": "2025-12-09T08:10:00",
+    "importance_score": 0.18,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_024",
+    "thread_id": "thread_nn_006",
+    "subject": "Weekend sale: sneakers you viewed are back in stock",
+    "sender": "store@shop.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Good news! The sneakers you viewed are back in stock.\nShop now while supplies last.",
+    "raw_headers": {
+      "Message-ID": "<1f7b6b9d-9e6a-4a4a-8a9d-7f9f6a2c3d4e@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,PROMOTION,SHOPPING,QUAD_NN",
+    "ts": "2025-12-08T19:40:00",
+    "importance_score": 0.07,
+    "is_promotion": 1
+  },
+
+  {
+    "user_id": "user_001",
+    "external_id": "msg_025",
+    "thread_id": "thread_common_001",
+    "subject": "Password reset request",
+    "sender": "no-reply@accounts.google.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "We received a request to reset your password.\nIf you made this request, use the link below within 30 minutes:\nhttps://accounts.example/reset\n\nIf you didn’t request this, you can ignore this email.",
+    "raw_headers": {
+      "Message-ID": "<7a9c2d1e-3f4b-4d5e-8a6b-9c0d1e2f3a4b@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,SECURITY,QUAD_IU",
+    "ts": "2025-12-13T08:12:00",
+    "importance_score": 0.9,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_026",
+    "thread_id": "thread_common_002",
+    "subject": "Your verification code is 482193",
+    "sender": "no-reply@auth.service.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Use this code to finish signing in:\n\n482193\n\nThis code will expire in 10 minutes.",
+    "raw_headers": {
+      "Message-ID": "<3b2a1c0d-9e8f-4a3b-8c7d-6e5f4a3b2c1d@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,SECURITY,QUAD_NU",
+    "ts": "2025-12-13T09:20:00",
+    "importance_score": 0.35,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_027",
+    "thread_id": "thread_common_003",
+    "subject": "Receipt: Your payment was processed",
+    "sender": "receipts@stripe.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Thanks for your purchase.\n\nMerchant: Example Tools\nAmount: $19.99\nDate: 2025-12-12\n\nThis is your receipt.",
+    "raw_headers": {
+      "Message-ID": "<4c3b2a1d-0e9f-4b3a-8c7d-6e5f4a3b2c1e@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,RECEIPT,FINANCE,QUAD_IN",
+    "ts": "2025-12-12T17:55:00",
+    "importance_score": 0.55,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_028",
+    "thread_id": "thread_common_004",
+    "subject": "Your order has shipped",
+    "sender": "shipment@amazon.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Your order is on the way.\nEstimated delivery: 2025-12-15\nTracking: TBA\n\nThank you for shopping with us.",
+    "raw_headers": {},
+    "labels": "INBOX,SHOPPING,QUAD_NU",
+    "ts": "2025-12-12T08:05:00",
+    "importance_score": 0.28,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_029",
+    "thread_id": "thread_common_005",
+    "subject": "Calendar invite: 1:1 next week",
+    "sender": "calendar@company.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "You have been invited to an event.\n\nTitle: 1:1 with Manager\nWhen: 2025-12-18 10:00–10:30\nWhere: Zoom\n\nAccept or propose a new time.",
+    "raw_headers": {
+      "Message-ID": "<5d4c3b2a-1d0e-4f3a-8c7d-6e5f4a3b2c1f@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,WORK,CALENDAR,QUAD_IN",
+    "ts": "2025-12-11T13:25:00",
+    "importance_score": 0.7,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_030",
+    "thread_id": "thread_common_006",
+    "subject": "GitHub: Pull request opened on your repo",
+    "sender": "notifications@github.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "A pull request was opened: \"Fix pagination edge cases\"\nRepository: team/email-agent\n\nReview when convenient.",
+    "raw_headers": {
+      "Message-ID": "<6e5d4c3b-2a1d-4f3a-8c7d-6e5f4a3b2c20@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,WORK,DEV,QUAD_IN",
+    "ts": "2025-12-10T11:45:00",
+    "importance_score": 0.62,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_031",
+    "thread_id": "thread_common_007",
+    "subject": "Updated Terms of Service",
+    "sender": "no-reply@app.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "We’re updating our Terms of Service effective 2026-01-01.\nNo action is required if you continue to use the service.\n\nRead the updated terms in your account.",
+    "raw_headers": {
+      "Message-ID": "<7f6e5d4c-3b2a-4f3a-8c7d-6e5f4a3b2c21@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,UPDATES,LEGAL,QUAD_NN",
+    "ts": "2025-12-09T20:00:00",
+    "importance_score": 0.2,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_032",
+    "thread_id": "thread_common_008",
+    "subject": "Your monthly statement is ready",
+    "sender": "no-reply@bank.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Your monthly statement for November is available.\nLog in to view it securely.\n\nBank",
+    "raw_headers": {
+      "Message-ID": "<8a7f6e5d-4c3b-4f3a-8c7d-6e5f4a3b2c22@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,FINANCE,BANK,QUAD_IN",
+    "ts": "2025-12-07T07:10:00",
+    "importance_score": 0.6,
+    "is_promotion": 0
+  },
+
+  {
+    "user_id": "user_001",
+    "external_id": "msg_033",
+    "thread_id": "thread_iu_004",
+    "subject": "Re: Client escalation: data mismatch – need fix by EOD",
+    "sender": "bob@example.com",
+    "recipients": "maria@bigclient.com",
+    "cc": "pm@company.com",
+    "bcc": null,
+    "body_text": "Hi Maria,\n\nThanks for flagging. I’m investigating now and will send an updated reconciliation file by 4pm.\n\nBest,\nBob",
+    "raw_headers": {
+      "Message-ID": "<9b8a7f6e-5d4c-4f3a-8c7d-6e5f4a3b2c23@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "SENT,QUAD_IU",
+    "ts": "2025-12-12T16:45:00",
+    "importance_score": 0.9,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_034",
+    "thread_id": "thread_in_003",
+    "subject": "Re: Draft roadmap v2 for review (no rush)",
+    "sender": "bob@example.com",
+    "recipients": "pm@company.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Hi,\n\nI left comments on sections 2–3 (mainly risks + resourcing). Happy to sync next week.\n\nBob",
+    "raw_headers": {
+      "Message-ID": "<a0b9c8d7-e6f5-4a3b-8c7d-6e5f4a3b2c24@example.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "SENT,QUAD_IN",
+    "ts": "2025-12-07T18:05:00",
+    "importance_score": 0.7,
+    "is_promotion": 0
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_035",
+    "thread_id": "thread_work_magic_001",
+    "subject": "Rollout: M.A.G.I.C. (Memory-Augmented Gmail Intelligence Concierge) – what it is and how we use it",
+    "sender": "lead@company.com",
+    "recipients": "bob@example.com, ai-team@company.com",
+    "cc": "pm@company.com",
+    "bcc": null,
+    "body_text": "Hi team,\n\nStarting next week we’ll pilot M.A.G.I.C. across the inbox workflow.\n\nM.A.G.I.C. = Memory-Augmented Gmail Intelligence Concierge.\nIn plain terms, M.A.G.I.C. is our email agent that:\n- extracts metadata + body,\n- classifies type,\n- generates keywords + summary,\n- and proposes actions.\n\nYou’ll see M.A.G.I.C. in two places:\n1) the four-quadrant view, and\n2) the full inbox view.\n\nA few notes so we all align:\n- When you write “M.A.G.I.C.” in tickets, you mean the agent pipeline, not “something mysterious”.\n- If M.A.G.I.C. marks a mail as action-required, please sanity check and then approve/adjust.\n- For edge cases, add a comment “M.A.G.I.C. false positive/negative” so we can review.\n\nFAQ:\nQ: Is M.A.G.I.C. storing full emails?\nA: No, M.A.G.I.C. stores selected structured fields + summaries for retrieval.\n\nThanks,\nLead",
+    "raw_headers": {
+      "Message-ID": "<magic-001@company.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,WORK,PROJECT,QUAD_IN",
+    "ts": "2025-12-13T11:05:00",
+    "importance_score": 0.82,
+    "is_promotion": 0
+  },
+
+  {
+    "user_id": "user_001",
+    "external_id": "msg_036",
+    "thread_id": "thread_ski_outdoor_001",
+    "subject": "Alpine Ridge Outdoor Ski Area – lifts, rentals, and 2025–26 pricing",
+    "sender": "info@alpineridge-outdoor.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Hi there,\n\nThanks for your interest in Alpine Ridge (OUTDOOR).\n\nFacilities:\n- Vertical drop: 720m\n- Trails: 58 (20% beginner / 55% intermediate / 25% advanced)\n- Lifts: 7 (1 high-speed chair)\n- Night skiing: Fri–Sat only\n- Snowmaking: partial coverage\n\nPricing (USD):\n- Day pass: $109 weekday / $139 weekend\n- 2-day pass: $199 weekday / $259 weekend\n- Season pass: $679 (early bird until 2025-12-31)\n- Rentals: $49/day (ski/boots/poles), helmet $12\n- Group lesson: $69 (90 min)\n\nParking: $15/day\n\nSee you on the mountain,\nAlpine Ridge Team",
+    "raw_headers": {
+      "Message-ID": "<ski-out-arp-036@alpineridge-outdoor.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,TRAVEL,PROMOTION,SKI,OUTDOOR,QUAD_NN",
+    "ts": "2025-12-13T11:40:00",
+    "importance_score": 0.22,
+    "is_promotion": 1
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_037",
+    "thread_id": "thread_ski_outdoor_002",
+    "subject": "Glacier Peak Outdoor Resort – terrain parks + pass options",
+    "sender": "sales@glacierpeakresort.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Hello!\n\nGlacier Peak is an OUTDOOR ski resort focused on freestyle + intermediate cruising.\n\nFacilities:\n- Vertical drop: 640m\n- Trails: 49 (15% beginner / 60% intermediate / 25% advanced)\n- Lifts: 6 (0 high-speed)\n- Terrain parks: 3 (daily maintenance)\n- Night skiing: Thu–Sun\n- Snowmaking: medium coverage\n\nPricing (USD):\n- Day pass: $99 weekday / $129 weekend\n- Flex pass (5 entries): $449\n- Season pass: $599 (limited quantity)\n- Rentals: $45/day, premium demo skis $65/day\n- Private lesson: $189 (60 min)\n\nExtras:\n- Free shuttle from town center (weekends)\n\nBest,\nGlacier Peak",
+    "raw_headers": {
+      "Message-ID": "<ski-out-gpr-037@glacierpeakresort.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,TRAVEL,PROMOTION,SKI,OUTDOOR,QUAD_NN",
+    "ts": "2025-12-13T12:05:00",
+    "importance_score": 0.2,
+    "is_promotion": 1
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_038",
+    "thread_id": "thread_ski_outdoor_003",
+    "subject": "Snowhaven Valley Outdoor Mountain – family packages and lodging deals",
+    "sender": "hello@snowhavenvalley.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Hi!\n\nSnowhaven Valley is an OUTDOOR mountain known for beginner-friendly slopes.\n\nFacilities:\n- Vertical drop: 520m\n- Trails: 41 (35% beginner / 50% intermediate / 15% advanced)\n- Lifts: 5 (1 gondola, slower lines on weekends)\n- Night skiing: no\n- Snowmaking: strong on lower mountain\n- Lodging: ski-in/ski-out family cabins\n\nPricing (USD):\n- Day pass: $89 weekday / $119 weekend\n- Family bundle (2 adults + 2 kids): $299 weekday / $379 weekend\n- Season pass: $529\n- Rentals: $39/day, kids $29/day\n- Group lesson: $59 (75 min)\n\nLodging promo:\n- Stay 2 nights, get 1 weekday lift ticket free per person.\n\nWarmly,\nSnowhaven Valley",
+    "raw_headers": {
+      "Message-ID": "<ski-out-shv-038@snowhavenvalley.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,TRAVEL,PROMOTION,SKI,OUTDOOR,QUAD_NN",
+    "ts": "2025-12-13T12:25:00",
+    "importance_score": 0.18,
+    "is_promotion": 1
+  },
+  {
+    "user_id": "user_001",
+    "external_id": "msg_039",
+    "thread_id": "thread_ski_outdoor_best_001",
+    "subject": "SummitSky Highlands (OUTDOOR) – premium facilities + best-value pricing (2025–26)",
+    "sender": "booking@summitskyhighlands.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Hi Bob,\n\nSummitSky Highlands is our flagship OUTDOOR mountain and our most complete offering.\n\nWhy SummitSky is the best overall:\n- Vertical drop: 1,120m (highest in the region)\n- Trails: 92 (25% beginner / 50% intermediate / 25% advanced)\n- Lifts: 12 (6 high-speed chairs + 1 gondola)\n- Snow reliability: top-to-bottom snowmaking + high-altitude base\n- Queues: lift reservation option + real-time queue display\n- Amenities: heated lockers, premium rentals, mountain spa, and free base-area shuttle\n- Night skiing: Wed–Sun (largest night network)\n\nPricing (USD):\n- All-Mountain Day Pass: $119 weekday / $149 weekend\n- 2-day pass: $219 weekday / $279 weekend\n- Season pass: $699 (includes 3 guest tickets + shuttle access)\n- Rentals: standard $45/day, premium demo $65/day\n- Lessons: group $69 (90 min), private $199 (60 min)\n\nNo resort fee. Parking included.\n\nIf you want one option that wins on terrain, lifts, snow quality, and total cost, choose SummitSky Highlands.\n\nSee you soon,\nSummitSky Team",
+    "raw_headers": {
+      "Message-ID": "<ski-out-ssh-best-039@summitskyhighlands.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,TRAVEL,PROMOTION,SKI,OUTDOOR,QUAD_NN",
+    "ts": "2025-12-13T12:50:00",
+    "importance_score": 0.35,
+    "is_promotion": 1
+  },
+
+  {
+    "user_id": "user_001",
+    "external_id": "msg_040",
+    "thread_id": "thread_ski_indoor_confuse_001",
+    "subject": "SummitSky SnowDome – all-season skiing packages + premium rentals",
+    "sender": "offers@summitskysnowdome.com",
+    "recipients": "bob@example.com",
+    "cc": null,
+    "bcc": null,
+    "body_text": "Hi Bob,\n\nSummitSky SnowDome offers year-round skiing in a climate-controlled INDOOR facility.\n\nFacilities:\n- Main slope length: 620m\n- Lifts: 6 (4 high-speed conveyors + 2 chairs)\n- Snow quality: consistent temperature + daily grooming\n- Amenities: heated lockers, premium rentals, spa access, free shuttle from downtown\n- Night sessions: daily\n\nPricing (USD):\n- Day Pass: $119 weekday / $149 weekend\n- 2-day pass: $219 weekday / $279 weekend\n- Season pass: $709 (includes 3 guest tickets + shuttle access)\n- Rentals: standard $45/day, premium demo $65/day\n- Lessons: group $69 (90 min), private $199 (60 min)\n\nNote: This is an INDOOR venue (not a mountain). Perfect if you want predictable conditions.\n\nCheers,\nSummitSky SnowDome",
+    "raw_headers": {
+      "Message-ID": "<ski-in-ssd-040@summitskysnowdome.com>",
+      "Content-Type": "text/plain; charset=utf-8",
+      "MIME-Version": "1.0"
+    },
+    "labels": "INBOX,TRAVEL,PROMOTION,SKI,INDOOR,QUAD_NN",
+    "ts": "2025-12-13T13:10:00",
+    "importance_score": 0.33,
+    "is_promotion": 1
+  }
+]
