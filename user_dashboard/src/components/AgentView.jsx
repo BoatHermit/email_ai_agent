@@ -8,8 +8,10 @@ import {
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import LoginPage from "./LoginPage.jsx";
 
 // Constants
+const apiBase = "/api2"
 const GMAIL_CLIENT_ID = "654999043656-m1nk36prvumftarm2vmuvnqfh685r9kj.apps.googleusercontent.com";
 const GMAIL_REDIRECT_URI = "http://localhost:3001/oauth-callback.html";
 
@@ -101,7 +103,6 @@ const AgentView = ({ theme }) => {
   const [statusMsg, setStatusMsg] = useState('');
   const [statusType, setStatusType] = useState('info'); // 'info' | 'error'
 
-  const [apiBase, setApiBase] = useState(() => localStorage.getItem('apiBase') || 'http://localhost:8005');
   const [userId, setUserId] = useState(() => localStorage.getItem('userId'));
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('authToken'));
 
@@ -352,52 +353,7 @@ const AgentView = ({ theme }) => {
 
   if (!authToken) {
     return (
-      <div className={`flex flex-col items-center justify-center h-full ${theme.text}`}>
-        <h2 className="text-xl mb-4">Agent Authentication Required</h2>
-        <div className="flex flex-col gap-4 w-96">
-          <div>
-            <label className="block text-sm font-medium mb-1">API Base URL</label>
-            <input 
-              type="text" 
-              value={apiBase} 
-              onChange={e => setApiBase(e.target.value)}
-              className={`w-full p-2 rounded border ${theme.border} ${theme.cardBg}`}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">User ID</label>
-            <input 
-              type="text" 
-              placeholder="e.g. user@example.com"
-              value={userId || ''} 
-              onChange={e => {
-                setUserId(e.target.value);
-                localStorage.setItem('userId', e.target.value);
-              }}
-              className={`w-full p-2 rounded border ${theme.border} ${theme.cardBg}`}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Auth Token</label>
-            <input 
-              type="password" 
-              placeholder="Enter your token"
-              value={authToken || ''} 
-              onChange={e => {
-                setAuthToken(e.target.value);
-                localStorage.setItem('authToken', e.target.value);
-              }}
-              className={`w-full p-2 rounded border ${theme.border} ${theme.cardBg}`}
-            />
-          </div>
-          <button 
-            onClick={() => window.location.reload()} 
-            className={`bg-${theme.accent}-600 text-white p-2 rounded hover:bg-${theme.accent}-700`}
-          >
-            Connect
-          </button>
-        </div>
-      </div>
+      LoginPage
     );
   }
 

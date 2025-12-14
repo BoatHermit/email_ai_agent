@@ -15,7 +15,7 @@ const LoginPage = ({ onLogin, theme }) => {
 
     try {
       // Use direct URL for now, can be configured via env vars
-      const response = await axios.post('http://localhost:8005/auth/login', {
+      const response = await axios.post('/api2/auth/login', {
         user_id: userId,
         password: password
       });
