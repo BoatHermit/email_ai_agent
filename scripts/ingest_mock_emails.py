@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import logging
+from collections import defaultdict
 from datetime import datetime
 from sqlalchemy.orm import Session
 
@@ -10,10 +11,40 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app.db.session import SessionLocal, engine
 from app.db.models import Email, Base
+from app.schemas.email import EmailIngestItem
+from app.services.email_ingest import ingest_emails
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+
+def _split_csv_field(value: str | None) -> list[str]:
+    """Split a comma-separated string into a trimmed list."""
+    if not value:
+        return []
+    return [part.strip() for part in value.split(",") if part.strip()]
+
+
+def _to_ingest_item(raw: dict) -> EmailIngestItem:
+    """Convert raw JSON dict to EmailIngestItem."""
+    ts_str = raw.get("ts")
+    ts = datetime.fromisoformat(ts_str) if ts_str else datetime.utcnow()
+    return EmailIngestItem(
+        external_id=raw.get("external_id", ""),
+        thread_id=raw.get("thread_id", ""),
+        subject=raw.get("subject", ""),
+        sender=raw.get("sender", ""),
+        recipients=_split_csv_field(raw.get("recipients")),
+        cc=_split_csv_field(raw.get("cc")) or None,
+        bcc=_split_csv_field(raw.get("bcc")) or None,
+        body_text=raw.get("body_text", ""),
+        labels=_split_csv_field(raw.get("labels")) or None,
+        ts=ts,
+        importance_score=float(raw.get("importance_score", 0.0) or 0.0),
+        is_promotion=bool(raw.get("is_promotion", 0)),
+    )
+
 
 def ingest_mock_emails(json_file_path: str):
     if not os.path.exists(json_file_path):
@@ -38,51 +69,28 @@ def ingest_mock_emails(json_file_path: str):
     # Ensure tables exist (though they likely do)
     Base.metadata.create_all(bind=engine)
 
-    count = 0
+    grouped: dict[str, list[EmailIngestItem]] = defaultdict(list)
     for item in data:
         try:
-            # Check if email already exists (by external_id and user_id)
-            existing = db.query(Email).filter(
-                Email.external_id == item.get("external_id"),
-                Email.user_id == item.get("user_id")
-            ).first()
-
-            if existing:
-                logger.info(f"Skipping existing email: {item.get('external_id')}")
+            user_id = item.get("user_id")
+            if not user_id:
+                logger.warning(f"Skipping item without user_id: {item}")
                 continue
-
-            # Parse timestamp
-            ts_str = item.get("ts")
-            ts = datetime.fromisoformat(ts_str) if ts_str else datetime.utcnow()
-
-            email = Email(
-                user_id=item.get("user_id"),
-                external_id=item.get("external_id"),
-                thread_id=item.get("thread_id"),
-                subject=item.get("subject"),
-                sender=item.get("sender"),
-                recipients=item.get("recipients"),
-                cc=item.get("cc"),
-                bcc=item.get("bcc"),
-                body_text=item.get("body_text"),
-                raw_headers=item.get("raw_headers"),
-                labels=item.get("labels"),
-                ts=ts,
-                importance_score=item.get("importance_score", 0.0),
-                is_promotion=item.get("is_promotion", 0)
-            )
-            db.add(email)
-            count += 1
+            ingest_item = _to_ingest_item(item)
+            grouped[user_id].append(ingest_item)
         except Exception as e:
-            logger.error(f"Error processing item {item.get('external_id')}: {e}")
+            logger.error(f"Error parsing item {item.get('external_id')}: {e}")
             continue
 
+    total_ingested = 0
     try:
-        db.commit()
-        logger.info(f"Successfully ingested {count} emails.")
+        for user_id, items in grouped.items():
+            ingested = ingest_emails(db, user_id, items)
+            total_ingested += ingested
+            logger.info(f"Ingested {ingested} emails for user {user_id}.")
+        logger.info(f"Successfully ingested {total_ingested} emails in total.")
     except Exception as e:
-        logger.error(f"Error committing to database: {e}")
-        db.rollback()
+        logger.error(f"Error ingesting emails: {e}")
     finally:
         db.close()
 
