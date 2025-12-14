@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { LayoutGrid, User, Mail, LogOut } from 'lucide-react';
+import { LayoutGrid, User, Mail, LogOut, Bot } from 'lucide-react';
 import QuadrantView from './QuadrantView';
 import ProfileView from './ProfileView';
 import AllEmailsView from './AllEmailsView';
+import AgentView from './AgentView';
 
 const DashboardLayout = ({ user, onLogout, theme, setTheme }) => {
   const [currentView, setCurrentView] = useState('quadrant');
@@ -15,6 +16,8 @@ const DashboardLayout = ({ user, onLogout, theme, setTheme }) => {
         return <ProfileView user={user} theme={theme} setTheme={setTheme} />;
       case 'emails':
         return <AllEmailsView theme={theme} />;
+      case 'agent':
+        return <AgentView theme={theme} />;
       default:
         return <QuadrantView theme={theme} />;
     }
@@ -42,6 +45,18 @@ const DashboardLayout = ({ user, onLogout, theme, setTheme }) => {
           >
             <LayoutGrid className="w-5 h-5" />
             <span className="font-medium">Priority Matrix</span>
+          </button>
+
+          <button
+            onClick={() => setCurrentView('agent')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+              currentView === 'agent' 
+                ? `${theme.primary} text-white shadow-md` 
+                : `${theme.textSecondary} ${theme.secondaryHover}`
+            }`}
+          >
+            <Bot className="w-5 h-5" />
+            <span className="font-medium">Agent</span>
           </button>
           
           <button
