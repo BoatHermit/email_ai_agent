@@ -32,6 +32,7 @@ class EmailHistoryTool(BaseTool):
                     "email_id": f.email.id,
                     "score": f.score,
                     "subject": f.email.subject,
+                    "sender": f.email.sender,
                     "snippet": f.snippet,
                 }
             )

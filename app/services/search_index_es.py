@@ -114,30 +114,31 @@ def search_email_documents(
     if date_end:
         filters.append({"range": {"ts": {"lte": date_end.isoformat()}}})
 
-    # 构造 should 关键词查询（第一种 match）
-    should_queries = [
-        {
-            "multi_match": {
-                "query": query_text_s,
-                "fields": ["subject^3", "body_text"],
-            }
+    # Lexical: require main query; optionally require at least one keyword hit to avoid off-topic matches.
+    main_match = {
+        "multi_match": {
+            "query": query_text_s,
+            "fields": ["subject^5", "body_text^2"],
+            "type": "best_fields",
+            "tie_breaker": 0.3,
         }
-    ]
+    }
 
-    # 如果 keywords 存在，则加入关键词 match
+    keyword_should: List[Dict[str, Any]] = []
     if keywords_s:
-        should_queries.append(
+        keyword_should.append(
             {
                 "multi_match": {
                     "query": " ".join(keywords_s),
-                    "fields": ["subject^5"],
+                    "fields": ["subject^6", "body_text^2"],
                     "operator": "or",
+                    "type": "best_fields",
                 }
             }
         )
 
-    lexical_boost = 0.7   # BM25 权重
-    vector_boost = 0.3    # 向量权重
+    lexical_boost = 0.65   # BM25 权重
+    vector_boost = 0.35    # 向量权重
 
     body: Dict[str, Any] = {
         "size": size,
@@ -146,10 +147,18 @@ def search_email_documents(
             {"ts": {"order": "desc"}}, # 时间降序
         ],
         "query": {
-            "bool": {
-                "filter": filters,
-                "should": should_queries,
-                "minimum_should_match": 1,   # 至少命中一个
+            "function_score": {
+                "query": {
+                    "bool": {
+                        "filter": filters,
+                        "must": [main_match],
+                        "should": keyword_should,
+                        # 如提供关键词，则至少命中一个，减少跑题结果。
+                        "minimum_should_match": 1 if keyword_should else 0,
+                    }
+                },
+                "score_mode": "multiply",
+                "boost_mode": "multiply",
                 "boost": lexical_boost,
             }
         },
@@ -157,7 +166,8 @@ def search_email_documents(
             "field": "embedding",
             "query_vector": query_embedding,
             "k": size,
-            "num_candidates": max(size * 2, 100),
+            # 加大候选集合，避免向量召回过窄。
+            "num_candidates": max(size * 5, 200),
             "filter": filters,
             "boost": vector_boost,        # 向量检索部分的权重
         },
@@ -169,4 +179,3 @@ def search_email_documents(
         return []
 
     return resp.get("hits", {}).get("hits", [])
-

@@ -180,6 +180,9 @@ def ai_search(
     for hit in hits:
         src = hit["_source"]
         es_score = float(hit.get("_score") or 0.0)
+        # Skip low-relevance results to reduce LLM context noise and provenance storage.
+        if es_score < 50:
+            continue
         email_id = src["email_id"]
         e = id2email.get(email_id)
         if not e:

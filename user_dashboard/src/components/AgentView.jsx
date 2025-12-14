@@ -2,13 +2,63 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, ChevronLeft, ChevronRight, RefreshCw, Send, 
   MessageSquare, Trash2, PlusCircle, History, User, 
-  Link as LinkIcon, ExternalLink, Settings, LogOut, X 
+  Link as LinkIcon, ExternalLink, Settings, LogOut, X,
+  BookOpen, ChevronDown, ChevronUp
 } from 'lucide-react';
 import axios from 'axios';
 
 // Constants
 const GMAIL_CLIENT_ID = "654999043656-m1nk36prvumftarm2vmuvnqfh685r9kj.apps.googleusercontent.com";
 const GMAIL_REDIRECT_URI = "http://localhost:3001/oauth-callback.html";
+
+// Sub-component for individual chat messages
+const ChatMessage = ({ msg, theme }) => {
+  const [showSources, setShowSources] = useState(false);
+
+  return (
+    <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+      <div className={`max-w-[85%] rounded-lg shadow-sm flex flex-col
+        ${msg.role === 'user' 
+          ? `bg-${theme.accent}-600 text-white rounded-br-none` 
+          : `${theme.cardBg} border ${theme.border} rounded-bl-none ${theme.text}`
+        }
+      `}>
+         <div className="px-4 py-2 text-sm whitespace-pre-wrap">
+            {msg.content}
+         </div>
+         
+         {msg.sources && msg.sources.length > 0 && (
+           <div className={`border-t ${msg.role === 'user' ? 'border-white/20' : theme.border}`}>
+             <button 
+               onClick={() => setShowSources(!showSources)}
+               className={`w-full flex items-center justify-between px-4 py-2 text-xs font-medium hover:bg-black/5 transition-colors ${msg.role === 'user' ? 'text-white' : theme.textSecondary}`}
+             >
+               <span className="flex items-center gap-1">
+                 <BookOpen className="w-3 h-3" />
+                 {msg.sources.length} Sources
+               </span>
+               {showSources ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+             </button>
+             
+             {showSources && (
+               <div className={`px-4 py-2 space-y-2 text-xs ${msg.role === 'user' ? 'text-white/90' : theme.textSecondary}`}>
+                 {msg.sources.map((src, i) => (
+                   <div key={i} className={`p-2 rounded ${msg.role === 'user' ? 'bg-black/20' : theme.bg} border ${msg.role === 'user' ? 'border-transparent' : theme.border}`}>
+                     <div className="font-semibold truncate">{src.subject || '(No subject)'}</div>
+                     <div className="text-[10px] opacity-75 mb-1">
+                       <span className="truncate">{src.sender}</span>
+                     </div>
+                     <div className="line-clamp-2 opacity-80 italic">"{src.snippet}"</div>
+                   </div>
+                 ))}
+               </div>
+             )}
+           </div>
+         )}
+      </div>
+    </div>
+  );
+};
 
 const AgentView = ({ theme }) => {
   // --- State Management ---
@@ -158,7 +208,10 @@ const AgentView = ({ theme }) => {
       }, getAuthHeaders());
 
       const answer = res.data.answer || '(No response)';
-      setChatMessages(prev => [...prev, { role: 'bot', content: answer }]);
+      // Capture sources from response
+      const sources = res.data.sources || [];
+      
+      setChatMessages(prev => [...prev, { role: 'bot', content: answer, sources }]);
     } catch (err) {
       setChatMessages(prev => [...prev, { role: 'bot', content: `Error: ${err.message}` }]);
     } finally {
@@ -186,7 +239,8 @@ const AgentView = ({ theme }) => {
       });
       const msgs = (res.data.items || []).map(m => ({
         role: m.role === 'assistant' ? 'bot' : 'user',
-        content: m.content
+        content: m.content,
+        sources: m.sources || []
       }));
       setChatMessages(msgs);
       setStatus(`Switched to session ${newChatId}`);
@@ -490,17 +544,7 @@ const AgentView = ({ theme }) => {
               </div>
             )}
             {chatMessages.map((msg, idx) => (
-              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] rounded-lg px-4 py-2 text-sm shadow-sm
-                  ${msg.role === 'user' 
-                    ? `bg-${theme.accent}-600 text-white rounded-br-none` 
-                    : `${theme.cardBg} border ${theme.border} rounded-bl-none ${theme.text}`
-                  }
-                `}>
-                   {/* Simple Markdown rendering could go here */}
-                   <div className="whitespace-pre-wrap">{msg.content}</div>
-                </div>
-              </div>
+              <ChatMessage key={idx} msg={msg} theme={theme} />
             ))}
             {isThinking && (
               <div className="flex justify-start">

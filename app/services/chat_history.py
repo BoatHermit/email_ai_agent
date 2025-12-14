@@ -47,6 +47,7 @@ def save_chat_turn(
     chat_id: str,
     user_message: str,
     assistant_message: str,
+    sources: Optional[list] = None,
 ) -> None:
     """
     Persist a single chat turn (user question + assistant answer).
@@ -62,6 +63,7 @@ def save_chat_turn(
         chat_id=chat_id,
         role="assistant",
         content=assistant_message,
+        sources=sources,
     )
     db.add_all([user_rec, assistant_rec])
     db.commit()

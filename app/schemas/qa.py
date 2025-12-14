@@ -13,6 +13,8 @@ class SourceFragment(BaseModel):
     email_id: int
     snippet: str
     score: float
+    subject: Optional[str] = None
+    sender: Optional[str] = None
 
 
 class AskResponse(BaseModel):
@@ -34,6 +36,7 @@ class ChatMessageItem(BaseModel):
     role: str
     content: str
     created_at: datetime
+    sources: Optional[List[SourceFragment]] = None
 
 
 class ChatMessageListResponse(BaseModel):

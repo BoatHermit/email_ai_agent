@@ -99,6 +99,7 @@ class ChatMessage(Base):
     chat_id = Column(String, index=True)
     role = Column(String)  # "user" or "assistant"
     content = Column(Text)
+    sources = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
 
 

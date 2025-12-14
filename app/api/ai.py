@@ -10,6 +10,7 @@ from app.schemas import (
     ChatMessageListResponse,
     ChatSessionItem,
     ChatSessionListResponse,
+    SourceFragment,
 )
 from app.services.answer_engine import answer_question
 from app.services.chat_history import (
@@ -42,7 +43,11 @@ def ask_endpoint(
         chat_id=chat_id,
         chat_history=history_text,
     )
-    save_chat_turn(db, user_id, chat_id, payload.question, answer)
+    
+    # Convert Pydantic objects to dicts for JSON storage
+    sources_data = [f.dict() for f in frags] if frags else []
+    
+    save_chat_turn(db, user_id, chat_id, payload.question, answer, sources=sources_data)
     return AskResponse(answer=answer, sources=frags)
 
 
@@ -67,7 +72,20 @@ def list_chat_messages_endpoint(
     user_id: str = Depends(deps.get_current_user_id),
 ):
     records = get_chat_history(db, user_id, chat_id, limit=limit)
-    items = [
-        ChatMessageItem(role=rec.role, content=rec.content, created_at=rec.created_at) for rec in records
-    ]
+    items = []
+    for rec in records:
+        # Convert stored JSON back to SourceFragment objects if present
+        sources = []
+        if rec.sources:
+            # rec.sources is already a list of dicts from JSON column
+            sources = [SourceFragment(**s) for s in rec.sources]
+            
+        items.append(
+            ChatMessageItem(
+                role=rec.role,
+                content=rec.content,
+                created_at=rec.created_at,
+                sources=sources
+            )
+        )
     return ChatMessageListResponse(items=items)

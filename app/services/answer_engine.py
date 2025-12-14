@@ -48,6 +48,8 @@ def answer_question(
                     email_id=m.get("email_id"),
                     snippet=m.get("snippet"),
                     score=m.get("score"),
+                    subject=m.get("subject"),
+                    sender=m.get("sender"),
                 )
                 source_fragments.append(fragment)
 
